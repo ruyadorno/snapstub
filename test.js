@@ -32,7 +32,7 @@ describe('snapstub', function () {
 		rimraf(path.join(__dirname, '__mocks__'), done);
 	});
 	it('should correctly save a snapshot', function (done) {
-		exec('snapstub add http://localhost:9194/data', (err, stdout) => {
+		exec('./index.js add http://localhost:9194/data', (err, stdout) => {
 			if (err) {
 				done(err);
 			}
@@ -45,7 +45,7 @@ describe('snapstub', function () {
 		});
 	});
 	it('should correctly save many snapshot methods', function (done) {
-		exec('snapstub add http://localhost:9194/data --method=post,head', (err, stdout) => {
+		exec('./index.js add http://localhost:9194/data --method=post,head', (err, stdout) => {
 			if (err) {
 				done(err);
 			}
@@ -61,11 +61,11 @@ describe('snapstub', function () {
 	});
 	it('should correctly retrieve snapshot data', function (done) {
 		this.timeout(6000);
-		exec('snapstub add http://localhost:9194/data', err => {
+		exec('./index.js add http://localhost:9194/data', err => {
 			if (err) {
 				done(err);
 			}
-			const child = exec('snapstub start');
+			const child = exec('./index.js start');
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.get('/data')
