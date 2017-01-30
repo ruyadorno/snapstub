@@ -1,0 +1,50 @@
+{
+  "name": "snapstub",
+  "version": "1.0.0",
+  "description": "Snapshot-based stub/mocking of APIs",
+  "main": "index.js",
+  "bin": "index.js",
+  "scripts": {
+    "lint": "eslint index.js test.js",
+    "pretest": "npm run lint",
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruyadorno/snapstub.git"
+  },
+  "keywords": [
+    "mock",
+    "stub",
+    "snapshot",
+    "snapstub",
+    "api",
+    "test",
+    "stubborn",
+    "stubborn-server"
+  ],
+  "author": {
+    "name": "Ruy Adorno",
+    "url": "ruyadorno.com"
+  },
+  "bugs": {
+    "url": "https://github.com/ruyadorno/tlr/issues"
+  },
+  "homepage": "https://github.com/ruyadorno/tlr#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^3.14.1",
+    "eslint-config-xo": "^0.17.0",
+    "mocha": "^3.2.0",
+    "rimraf": "^2.5.4",
+    "supertest": "^2.0.1"
+  },
+  "dependencies": {
+    "got": "^6.7.1",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "simple-output": "^1.0.0",
+    "stubborn-server": "^0.8.2",
+    "url-parse-lax": "^1.0.0"
+  }
+}
