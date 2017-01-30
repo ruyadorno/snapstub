@@ -4,6 +4,9 @@
   "description": "Snapshot-based stub/mocking of APIs",
   "main": "index.js",
   "bin": "index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "lint": "eslint index.js test.js",
     "pretest": "npm run lint",
