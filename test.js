@@ -18,9 +18,23 @@ const data = {
 	}
 };
 
+const postData = {
+	success: true
+};
+
+const putData = {
+	x: 'foo'
+};
+
 express()
 	.get('/data', (req, res) => {
 		res.json(data);
+	})
+	.post('/data', (req, res) => {
+		res.json(postData);
+	})
+	.put('/data', (req, res) => {
+		res.json(putData);
 	})
 	.listen(9194);
 
@@ -73,7 +87,45 @@ describe('snapstub', function () {
 					.expect(data)
 					.end(() => { // eslint-disable-line
 						child.kill();
-						done();
+						done(err);
+					});
+			}, 2000);
+		});
+	});
+	it('should correctly retrieve snapshot data from post method', function (done) {
+		this.timeout(6000);
+		exec('./index.js add http://localhost:9194/data --method=post', err => {
+			if (err) {
+				done(err);
+			}
+			const child = exec('./index.js start');
+			setTimeout(() => {
+				request('http://localhost:8059')
+					.post('/data')
+					.expect('Content-Type', /json/)
+					.expect(postData)
+					.end(err => { // eslint-disable-line
+						child.kill();
+						done(err);
+					});
+			}, 2000);
+		});
+	});
+	it('should correctly retrieve snapshot data from multiple http methods', function (done) {
+		this.timeout(6000);
+		exec('./index.js add http://localhost:9194/data --method=post,get,put', err => {
+			if (err) {
+				done(err);
+			}
+			const child = exec('./index.js start');
+			setTimeout(() => {
+				request('http://localhost:8059')
+					.put('/data')
+					.expect('Content-Type', /json/)
+					.expect(putData)
+					.end(err => { // eslint-disable-line
+						child.kill();
+						done(err);
 					});
 			}, 2000);
 		});

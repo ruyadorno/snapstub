@@ -20,14 +20,14 @@ const commands = {
 		const methodList = argv.method || 'get';
 		const methods = methodList.split(',');
 		const isJson = !argv.nojson;
-		got(url, {json: isJson})
-			.then(result => {
+		Promise.all(methods.map(name => got[name](url, {json: isJson})))
+			.then(results => {
 				const folderPath = path.join(ROOT, urlParse(url).pathname);
 				mkdirp.sync(folderPath);
-				methods.forEach(method => {
+				methods.forEach((method, index) => {
 					const fileExt = isJson ? '.json' : '';
 					const fileName = path.join(folderPath, method.trim() + fileExt);
-					fs.writeFileSync(fileName, JSON.stringify(result.body));
+					fs.writeFileSync(fileName, JSON.stringify(results[index].body));
 					out.success(`Successfully added: ${fileName}`);
 				});
 			})
