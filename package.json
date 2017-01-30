@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "got": "^6.7.1",
+    "jsonlint": "^1.6.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "simple-output": "^1.0.0",

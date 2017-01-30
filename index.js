@@ -11,6 +11,7 @@ const urlParse = require('url-parse-lax');
 const mkdirp = require('mkdirp');
 const out = require('simple-output');
 const stubborn = require('stubborn-server');
+const jsonlint = require('jsonlint/lib/formatter');
 
 const ROOT = path.join(process.cwd(), '__mocks__');
 const commandName = argv._[0];
@@ -27,7 +28,7 @@ const commands = {
 				methods.forEach((method, index) => {
 					const fileExt = isJson ? '.json' : '';
 					const fileName = path.join(folderPath, method.trim() + fileExt);
-					fs.writeFileSync(fileName, JSON.stringify(results[index].body));
+					fs.writeFileSync(fileName, jsonlint.formatter.formatJson(JSON.stringify(results[index].body)));
 					out.success(`Successfully added: ${fileName}`);
 				});
 			})
