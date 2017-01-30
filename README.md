@@ -2,7 +2,7 @@
 
 > Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog/2016/07/27/jest-14.html)
 
-Small command line tool that allows you to take "snapshots" of any given API endpoint and store the response. Using the `start` command you can spawn a server that will serve all previously stored endpoints.
+Small command line tool that allows you to take "snapshots" of any given API endpoint and store the response. Using the `start` command will spawn a server that will serve all previously stored endpoints.
 
 ## Install
 
@@ -14,7 +14,7 @@ npm install -g snapstub
 
 Make sure you're in the desired folder to host your api mock files.
 
-Creates a new api stub:
+:arrow_down: Creates a new api stub:
 
 ```sh
 snapstub add http://example.com/api/foo/bar
@@ -22,11 +22,13 @@ snapstub add http://example.com/api/foo/bar
 
 ...create as many snapshots as you want.
 
-Starts your mock server:
+:rocket: Starts your mock server:
 
 ```sh
 snapstub start
 ```
+
+:sparkles: Your endpoint will be locally available at: `http://localhost:8059/api/foo/bar`
 
 ### More options
 
@@ -48,7 +50,9 @@ snatstub start
 
 By default snapshots will be saved in a `__mocks__` folder that resolves from the current working directory, so make sure you run the commands from the correct project folder you desire.
 
-### Credit
+NOTE: **v1.0.x** only supports `json` endpoints.
+
+## Credit
 
 **snapstub** wouldn't be possible without [stubborn-server](https://github.com/zeachco/stubborn-server), go take a look at it if you need to support more complex scenarios.
 
