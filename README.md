@@ -20,6 +20,8 @@ Creates a new api stub:
 snapstub add http://example.com/api/foo/bar
 ```
 
+...create as many snapshots as you want.
+
 Starts your mock server:
 
 ```sh
@@ -41,6 +43,10 @@ export SNAPSTUB_FOLDER_NAME=my-mock-folder/
 export SNAPSTUB_PORT=9000
 snatstub start
 ```
+
+### More info
+
+By default snapshots will be saved in a `__mocks__` folder that resolves from the current working directory, so make sure you run the commands from the correct project folder you desire.
 
 ### Credit
 
