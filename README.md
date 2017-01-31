@@ -43,7 +43,7 @@ Using custom port and/or folder name:
 ```sh
 export SNAPSTUB_FOLDER_NAME=my-mock-folder/
 export SNAPSTUB_PORT=9000
-snatstub start
+snapstub start
 ```
 
 ### More info
