@@ -3,9 +3,11 @@
 'use strict';
 
 const path = require('path');
-const argv = require('minimist')(process.argv.slice(2));
 
-const ROOT = path.join(process.cwd(), '__mocks__');
+const argv = require('minimist')(process.argv.slice(2));
+const mockFolderName = process.env.SNAPSTUB_FOLDER_NAME || '__mocks__';
+const port = process.env.SNAPSTUB_PORT || 8059;
+const rootPath = path.join(process.cwd(), mockFolderName);
 const commandName = argv._[0];
 const commands = {
 	add: require('./commands/add'),
@@ -17,7 +19,9 @@ const commands = {
 if (commandName in commands) {
 	commands[commandName]({
 		argv: argv,
-		rootPath: ROOT
+		mockFolderName: mockFolderName,
+		port: port,
+		rootPath: rootPath
 	});
 } else if (argv.version || argv.v) {
 	commands.version();

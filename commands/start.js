@@ -2,12 +2,14 @@
 
 const stubborn = require('stubborn-server');
 
-function startCmd() {
+function startCmd(opts) {
+	const mockFolderName = opts.mockFolderName;
+	const port = opts.port;
 	stubborn.start({
 		logMode: 'all',
 		namespace: '',
-		pathToMocks: process.env.SNAPSTUB_FOLDER_NAME || '__mocks__',
-		servePort: process.env.SNAPSTUB_PORT || 8059,
+		pathToMocks: mockFolderName,
+		servePort: port,
 		fallbacks: []
 	});
 }
