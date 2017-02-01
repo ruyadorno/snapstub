@@ -2,80 +2,23 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
-
 const argv = require('minimist')(process.argv.slice(2));
-const got = require('got');
-const urlParse = require('url-parse-lax');
-const mkdirp = require('mkdirp');
-const out = require('simple-output');
-const stubborn = require('stubborn-server');
-const jsonlint = require('jsonlint/lib/formatter');
 
 const ROOT = path.join(process.cwd(), '__mocks__');
 const commandName = argv._[0];
 const commands = {
-	add: addCmd,
-	help: helpCmd,
-	start: startCmd,
-	version: versionCmd
+	add: require('./commands/add'),
+	help: require('./commands/help'),
+	start: require('./commands/start'),
+	version: require('./commands/version')
 };
 
-function addCmd() {
-	const url = argv._[1];
-	const methodList = argv.method || 'get';
-	const methods = methodList.split(',');
-	const isJson = !argv.nojson;
-	Promise.all(methods.map(name => got[name](url, {json: isJson})))
-		.then(results => {
-			const folderPath = path.join(ROOT, urlParse(url).pathname);
-			mkdirp.sync(folderPath);
-			methods.forEach((method, index) => {
-				const fileExt = isJson ? '.json' : '';
-				const fileName = path.join(folderPath, method.trim() + fileExt);
-				fs.writeFileSync(fileName, jsonlint.formatter.formatJson(JSON.stringify(results[index].body)));
-				out.success(`Successfully added: ${fileName}`);
-			});
-		})
-		.catch(out.error);
-}
-
-function helpCmd() {
-	console.log(`
-Usage:
-  snapstub [command]
-
-Available commands:
-  help         Output usage info
-  version      Get current version number
-  start        Starts the built-in static mock server
-  add <url>    Takes a snapshot of a given url and stores in the local fs
-
-Options:
-  --method     Specifies different http methods to use, defaults to GET
-
-More info:
-  https://github.com/ruyadorno/snapstub
-`);
-}
-
-function startCmd() {
-	stubborn.start({
-		logMode: 'all',
-		namespace: '',
-		pathToMocks: process.env.SNAPSTUB_FOLDER_NAME || '__mocks__',
-		servePort: process.env.SNAPSTUB_PORT || 8059,
-		fallbacks: []
-	});
-}
-
-function versionCmd() {
-	console.log(require('./package.json').version);
-}
-
 if (commandName in commands) {
-	commands[commandName]();
+	commands[commandName]({
+		argv: argv,
+		rootPath: ROOT
+	});
 } else if (argv.version || argv.v) {
 	commands.version();
 } else {
