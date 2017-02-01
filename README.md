@@ -30,13 +30,19 @@ snapstub start
 
 :sparkles: Your endpoint will be locally available at: `http://localhost:8059/api/foo/bar`
 
-### More options
+<br/>
+
+## Advanced Usage
+
+### Using different http methods
 
 If you want to save one or many different http methods, use the `--method` flag:
 
 ```sh
 snapstub add http://example.com/api/foo/bar --method=get,post,put
 ```
+
+### Change defaults
 
 Using custom port and/or folder name:
 
@@ -50,11 +56,11 @@ snapstub start
 
 By default snapshots will be saved in a `__mocks__` folder that resolves from the current working directory, so make sure you run the commands from the correct project folder you desire.
 
-NOTE: **v1.0.x** only supports `json` endpoints.
+NOTE: **v1.x** only supports `json` endpoints.
 
 ## Credit
 
-**snapstub** wouldn't be possible without [stubborn-server](https://github.com/zeachco/stubborn-server), go take a look at it if you need to support more complex scenarios.
+**snapstub** wouldn't be possible without [stubborn-server](https://github.com/zeachco/stubborn-server) - it's a very flexible mock server based on static files, if you have the need to handle more complex scenarios (handling route params, dynamic responses, etc) go take a look at it.
 
 ## License
 

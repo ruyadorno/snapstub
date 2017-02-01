@@ -130,5 +130,17 @@ describe('snapstub', function () {
 			}, 2000);
 		});
 	});
+	it('should get help message when using no valid command', function (done) {
+		exec('./index.js', (err, stdout) => {
+			assert.strictEqual(stdout.indexOf('Usage:'), 1);
+			done(err);
+		});
+	});
+	it('should get version number when using --version flag', function (done) {
+		exec('./index.js --version', (err, stdout) => {
+			assert.strictEqual(stdout.trim(), require('./package.json').version);
+			done(err);
+		});
+	});
 });
 
