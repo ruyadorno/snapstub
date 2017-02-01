@@ -49,6 +49,7 @@
     "jsonlint": "^1.6.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
+    "parse-headers": "^2.0.1",
     "simple-output": "^1.0.0",
     "stubborn-server": "^0.8.2",
     "url-parse-lax": "^1.0.0"

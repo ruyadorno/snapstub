@@ -13,6 +13,7 @@ Available commands:
 
 Options:
   --method     Specifies different http methods to use, defaults to GET
+  --header     Adds a custom header to the request
 
 More info:
   https://github.com/ruyadorno/snapstub

@@ -73,6 +73,43 @@ describe('snapstub', function () {
 			done();
 		});
 	});
+	it('should be able to set a custom header when adding snapshots', function (done) {
+		express()
+			.get('/data', (req, res) => {
+				assert.strictEqual(req.get('X-Token'), '0123F');
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9195, e => {
+				if (e) {
+					done(e);
+				}
+				exec('./index.js add http://localhost:9195/data --header "X-Token: 0123F"', err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
+	it('should be able to set multiple custom headers when adding snapshots', function (done) {
+		express()
+			.get('/data', (req, res) => {
+				assert.strictEqual(req.get('X-Foo'), 'bar');
+				assert.strictEqual(req.get('X-Token'), '0123F');
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9196, e => {
+				if (e) {
+					done(e);
+				}
+				exec('./index.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"', err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
 	it('should correctly retrieve snapshot data', function (done) {
 		this.timeout(6000);
 		exec('./index.js add http://localhost:9194/data', err => {

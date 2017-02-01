@@ -10,6 +10,8 @@ Small command line tool that allows you to take "snapshots" of any given API end
 npm install -g snapstub
 ```
 
+<br/>
+
 ## Usage
 
 Make sure you're in the desired folder to host your api mock files.
@@ -36,10 +38,24 @@ snapstub start
 
 ### Using different http methods
 
-If you want to save one or many different http methods, use the `--method` flag:
+If you want to save one or many different http methods, use the `--method` option:
 
 ```sh
 snapstub add http://example.com/api/foo/bar --method=get,post,put
+```
+
+### Using custom headers to add a new route
+
+If you need to pass a custom header along with your request, let's say one is needed for a auth token or any other reason, use the `--header` option:
+
+```sh
+snapstub add http://example.com/api/user/42 --header "X-Token: 1234"
+```
+
+You can set as many custom headers as you need:
+
+```sh
+snapstub add http://example.com/api/login --header "X-User: foo" --header "X-Token: bar"
 ```
 
 ### Change defaults
@@ -57,6 +73,8 @@ snapstub start
 By default snapshots will be saved in a `__mocks__` folder that resolves from the current working directory, so make sure you run the commands from the correct project folder you desire.
 
 NOTE: **v1.x** only supports `json` endpoints.
+
+<br/>
 
 ## Credit
 
