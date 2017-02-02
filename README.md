@@ -58,6 +58,28 @@ You can set as many custom headers as you need:
 snapstub add http://example.com/api/login --header "X-User: foo" --header "X-Token: bar"
 ```
 
+### Sending data when adding a new route
+
+Usually a POST/PUT method will also require data to be send along with the request, you can do so by using the `--data` option:
+
+```sh
+snapstub add http://example.com/api/user/new --data "name=Foo"
+```
+
+**Content-Type** headers will be set automatically but if you specify one (using `--header` option) that will take precedence.
+
+It also accepts json data (Content-Type will be set to `application/json` automatically):
+
+```sh
+snapstub add http://example.com/api/user/new --data "{ \"name\": \"Lorem\" }"
+```
+
+If no method is defined it defaults to **POST**, if you want to use PUT instead just use the `--method` option:
+
+```sh
+snapstub add http://example.com/api/user/update --data "name=Bar" --method=put
+```
+
 ### Change defaults
 
 Using custom port and/or folder name:

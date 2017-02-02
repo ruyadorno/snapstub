@@ -111,6 +111,28 @@ describe('snapstub', function () {
 				});
 			});
 	});
+	it('should be able to POST simple json data', function (done) {
+		const bodyData = {
+			foo: 'Bar'
+		};
+		express()
+			.use(bodyParser.json())
+			.post('/data', (req, res) => {
+				assert.deepStrictEqual(req.body, bodyData);
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9200, e => {
+				if (e) {
+					done(e);
+				}
+				exec('./index.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'', err => { // eslint-disable-line no-useless-escape
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
 	it('should be able to POST json data', function (done) {
 		const bodyData = {
 			foo: 'bar',
