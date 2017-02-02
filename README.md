@@ -71,7 +71,7 @@ snapstub add http://example.com/api/user/new --data "name=Foo"
 It also accepts json data (Content-Type will be set to `application/json` automatically):
 
 ```sh
-snapstub add http://example.com/api/user/new --data "{ \"name\": \"Lorem\" }"
+snapstub add http://example.com/api/user/new --data '{ "name": "Lorem" }'
 ```
 
 If no method is defined it defaults to **POST**, if you want to use PUT instead just use the `--method` option:
