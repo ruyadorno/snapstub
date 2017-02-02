@@ -9,6 +9,7 @@ const rimraf = require('rimraf');
 const mkdirp = require('mkdirp');
 const express = require('express');
 const request = require('supertest');
+const bodyParser = require('body-parser');
 
 const data = {
 	foo: 'bar',
@@ -104,6 +105,73 @@ describe('snapstub', function () {
 					done(e);
 				}
 				exec('./index.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"', err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
+	it('should be able to POST json data', function (done) {
+		const bodyData = {
+			foo: 'bar',
+			more: {
+				lorem: 'ipsum',
+				dolor: 'sit'
+			}
+		};
+		express()
+			.use(bodyParser.json())
+			.post('/data', (req, res) => {
+				assert.deepStrictEqual(req.body, bodyData);
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9197, e => {
+				if (e) {
+					done(e);
+				}
+				exec(`./index.js add http://localhost:9197/data --data '${JSON.stringify(bodyData)}'`, err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
+	it('should be able to POST form data', function (done) {
+		const bodyData = 'parameter=value&also=another';
+		express()
+			.use(bodyParser.urlencoded({extended: true}))
+			.post('/data', (req, res) => {
+				assert.strictEqual(req.body.parameter, 'value');
+				assert.strictEqual(req.body.also, 'another');
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9198, e => {
+				if (e) {
+					done(e);
+				}
+				exec(`./index.js add http://localhost:9198/data --data "${bodyData}"`, err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
+	it('should be able to PUT form data', function (done) {
+		const bodyData = 'parameter=something';
+		express()
+			.use(bodyParser.urlencoded({extended: true}))
+			.all('/data', (req, res) => {
+				assert.strictEqual(req.body.parameter, 'something');
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9199, e => {
+				if (e) {
+					done(e);
+				}
+				exec(`./index.js add http://localhost:9199/data --data "${bodyData}" --method=put`, err => {
 					if (err) {
 						done(err);
 					}
