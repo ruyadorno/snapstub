@@ -60,7 +60,7 @@ snapstub add http://example.com/api/login --header "X-User: foo" --header "X-Tok
 
 ### Sending data when adding a new route
 
-Usually a POST/PUT method will also require data to be send along with the request, you can do so by using the `--data` option:
+Usually a POST/PUT method will also require data to be sent along with the request, you can do so by using the `--data` option:
 
 ```sh
 snapstub add http://example.com/api/user/new --data "name=Foo"
