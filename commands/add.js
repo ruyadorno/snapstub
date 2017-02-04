@@ -19,14 +19,20 @@ function addCmd(opts) {
 	const customHeaders = [].concat(argv.header).join('\n');
 
 	function getData() {
+		let data = argv.data;
 		let body;
 		let type;
 
 		try {
-			body = JSON.stringify(JSON.parse(argv.data));
+			data = fs.readFileSync(data).toString();
+		} catch (e) {
+		}
+
+		try {
+			body = JSON.stringify(JSON.parse(data));
 			type = 'application/json';
 		} catch (e) {
-			body = argv.data;
+			body = data;
 			type = 'application/x-www-form-urlencoded';
 		}
 
