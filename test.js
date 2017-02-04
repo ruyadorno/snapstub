@@ -184,7 +184,7 @@ describe('snapstub', function () {
 		const bodyData = 'parameter=something';
 		express()
 			.use(bodyParser.urlencoded({extended: true}))
-			.all('/data', (req, res) => {
+			.put('/data', (req, res) => {
 				assert.strictEqual(req.body.parameter, 'something');
 				res.sendStatus(200);
 				done();
@@ -194,6 +194,44 @@ describe('snapstub', function () {
 					done(e);
 				}
 				exec(`./index.js add http://localhost:9199/data --data "${bodyData}" --method=put`, err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
+	it('should be able to send from data file', function (done) {
+		express()
+			.use(bodyParser.urlencoded({extended: true}))
+			.post('/data', (req, res) => {
+				assert.strictEqual(req.body.dolor.trim(), 'sit');
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9201, e => {
+				if (e) {
+					done(e);
+				}
+				exec(`./index.js add http://localhost:9201/data --data ./fixtures/data`, err => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+	});
+	it('should be able to send from json data file', function (done) {
+		express()
+			.use(bodyParser.json())
+			.post('/data', (req, res) => {
+				assert.strictEqual(req.body.foo, 'Lorem');
+				res.sendStatus(200);
+				done();
+			})
+			.listen(9202, e => {
+				if (e) {
+					done(e);
+				}
+				exec(`./index.js add http://localhost:9202/data --data ./fixtures/data.json`, err => {
 					if (err) {
 						done(err);
 					}
