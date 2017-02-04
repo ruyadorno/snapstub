@@ -80,6 +80,16 @@ If no method is defined it defaults to **POST**, if you want to use PUT instead 
 snapstub add http://example.com/api/user/update --data "name=Bar" --method=put
 ```
 
+### Sending data read from a file
+
+You can also point the `--data` option to a file in order to use the contents of that file as a payload. This is a good way to maintain repeatable calls to POST/PUT routes. Given that there is a `payload.json` file in the current working directory:
+
+```sh
+snapstub add http://example.com/api/user/add --data ./payload.json
+```
+
+Headers will be automatically added and the content will be exactly as read from the file.
+
 ### Change defaults
 
 Using custom port and/or folder name:
