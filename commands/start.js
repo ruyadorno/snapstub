@@ -6,7 +6,7 @@ function startCmd(opts) {
 	const mockFolderName = opts.mockFolderName;
 	const port = opts.port;
 	stubborn.start({
-		logMode: 'all',
+		logMode: opts.verbose ? 'all' : 'warn',
 		namespace: '',
 		pathToMocks: mockFolderName,
 		servePort: port,
