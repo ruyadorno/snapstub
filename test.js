@@ -3,7 +3,9 @@
 'use strict';
 
 const assert = require('assert');
-const exec = require('child_process').exec;
+const p = require('child_process');
+const exec = p.exec;
+const spawn = p.spawn;
 const path = require('path');
 const rimraf = require('rimraf');
 const mkdirp = require('mkdirp');
@@ -244,7 +246,10 @@ describe('snapstub', function () {
 			if (err) {
 				done(err);
 			}
-			const child = exec('./index.js start');
+			const child = spawn('./index.js', ['start']);
+			child.stderr.on('data', err => {
+				throw new Error(err.toString());
+			});
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.get('/data')
@@ -263,7 +268,10 @@ describe('snapstub', function () {
 			if (err) {
 				done(err);
 			}
-			const child = exec('./index.js start');
+			const child = spawn('./index.js', ['start']);
+			child.stderr.on('data', err => {
+				throw new Error(err.toString());
+			});
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.post('/data')
@@ -282,7 +290,10 @@ describe('snapstub', function () {
 			if (err) {
 				done(err);
 			}
-			const child = exec('./index.js start');
+			const child = spawn('./index.js', ['start']);
+			child.stderr.on('data', err => {
+				throw new Error(err.toString());
+			});
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.put('/data')
@@ -293,6 +304,42 @@ describe('snapstub', function () {
 						done(err);
 					});
 			}, 2000);
+		});
+	});
+	it('should not print messages to console by default', function (done) {
+		this.timeout(6000);
+		exec('./index.js add http://localhost:9194/data', err => {
+			if (err) {
+				done(err);
+			}
+			const child = spawn('./index.js', ['start']);
+			child.stderr.on('data', err => {
+				throw new Error(err.toString());
+			});
+			child.stdout.on('data', data => {
+				assert.equal(data.toString().split('pathToMocks'), -1);
+			});
+			setTimeout(() => {
+				child.kill();
+				done(err);
+			}, 2000);
+		});
+	});
+	it('should print messages to console when using --verbose option', function (done) {
+		this.timeout(6000);
+		exec('./index.js add http://localhost:9194/data', err => {
+			if (err) {
+				done(err);
+			}
+			const child = spawn('./index.js', ['start', '--verbose']);
+			child.stderr.on('data', err => {
+				throw new Error(err.toString());
+			});
+			child.stdout.on('data', data => {
+				assert.notEqual(data.toString().split('pathToMocks'), -1);
+				child.kill();
+				done(err);
+			});
 		});
 	});
 	it('should get help message when using no valid command', function (done) {

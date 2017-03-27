@@ -5,6 +5,7 @@
 const path = require('path');
 
 const argv = require('minimist')(process.argv.slice(2));
+const verbose = argv.verbose;
 const mockFolderName = process.env.SNAPSTUB_FOLDER_NAME || '__mocks__';
 const port = process.env.SNAPSTUB_PORT || 8059;
 const rootPath = path.join(process.cwd(), mockFolderName);
@@ -21,7 +22,8 @@ if (commandName in commands) {
 		argv: argv,
 		mockFolderName: mockFolderName,
 		port: port,
-		rootPath: rootPath
+		rootPath: rootPath,
+		verbose: verbose
 	});
 } else if (argv.version || argv.v) {
 	commands.version();
