@@ -1,8 +1,28 @@
-# snapstub [![NPM version](https://badge.fury.io/js/snapstub.svg)](https://npmjs.org/package/snapstub) [![Build Status](https://travis-ci.org/ruyadorno/snapstub.svg?branch=master)](https://travis-ci.org/ruyadorno/snapstub)
+# snapstub
 
-> Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog/2016/07/27/jest-14.html)
+[![NPM version](https://badge.fury.io/js/snapstub.svg)](https://npmjs.org/package/snapstub) [![Build Status](https://travis-ci.org/ruyadorno/snapstub.svg?branch=master)](https://travis-ci.org/ruyadorno/snapstub)
+
+> Snapshot-based stub/mocking of APIs
 
 Small command line tool that allows you to take "snapshots" of any given API endpoint and store the response. Using the `start` command will spawn a server that will serve all previously stored endpoints.
+
+Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog/2016/07/27/jest-14.html)
+
+## Table of Contents
+
+- [Install](#install)
+- [Usage](#usage)
+- [Advanced Usage](#advanced-usage)
+	- [Using different http methods](#using-different-http-methods)
+	- [Using custom headers to add a new route](#using-custom-headers-to-add-a-new-route)
+	- [Sending data when adding a new route](#sending-data-when-adding-a-new-route)
+	- [Sending data read from a file](#sending-data-read-from-a-file)
+	- [Change defaults](#change-defaults)
+	- [More info](#more-info)
+- [Credit](#credit)
+- [Maintainers](#maintainers)
+- [Contribute](#contribute)
+- [License](#license)
 
 ## Install
 
@@ -112,7 +132,14 @@ NOTE: **v1.x** only supports `json` endpoints.
 
 **snapstub** wouldn't be possible without [stubborn-server](https://github.com/zeachco/stubborn-server) - it's a very flexible mock server based on static files, if you have the need to handle more complex scenarios (handling route params, dynamic responses, etc) go take a look at it.
 
+## Maintainers
+
+- [@RuyAdorno](https://github.com/ruyadorno)
+
+## Contribute
+
+Please do! This is an open source project. If you would like a feature, open a pull request. If you have a bug or want to discuss something, [open an issue](https://github.com/ruyadorno/snapstub/issues/new).
+
 ## License
 
-MIT © [Ruy Adorno](http://ruyadorno.com)
-
+[MIT](LICENSE) © 2017 [Ruy Adorno](http://ruyadorno.com)
