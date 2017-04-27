@@ -317,7 +317,7 @@ describe('snapstub', function () {
 				throw new Error(err.toString());
 			});
 			child.stdout.on('data', data => {
-				assert.equal(data.toString().split('pathToMocks'), -1);
+				assert.equal(data.toString(), '✔  Successfully launched snapstub server on: http://localhost:8059\n');
 			});
 			setTimeout(() => {
 				child.kill();
