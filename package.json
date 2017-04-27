@@ -46,8 +46,10 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
+    "globby": "^6.1.0",
     "got": "^6.7.1",
     "jsonlint": "^1.6.2",
+    "methods": "^1.1.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "parse-headers": "^2.0.1",
