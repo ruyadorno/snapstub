@@ -9,7 +9,7 @@
     "commands/"
   ],
   "scripts": {
-    "lint": "eslint index.js test.js",
+    "lint": "eslint index.js commands/*.js test.js",
     "pretest": "npm run lint",
     "test": "mocha test.js"
   },
