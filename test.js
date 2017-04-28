@@ -316,8 +316,11 @@ describe('snapstub', function () {
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
-			child.stdout.on('data', data => {
+			child.stdout.once('data', data => {
 				assert.equal(data.toString(), '✔  Successfully launched snapstub server on: http://localhost:8059\n');
+				child.stdout.once('data', d => {
+					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data/\n');
+				});
 			});
 			setTimeout(() => {
 				child.kill();
