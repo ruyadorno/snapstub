@@ -306,7 +306,7 @@ describe('snapstub', function () {
 			}, 2000);
 		});
 	});
-	it('should not print messages to console by default', function (done) {
+	it('should print route messages to console by default', function (done) {
 		this.timeout(6000);
 		exec('./index.js add http://localhost:9194/data', err => {
 			if (err) {
@@ -316,12 +316,18 @@ describe('snapstub', function () {
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
-			child.stdout.once('data', data => {
-				assert.equal(data.toString(), '✔  Successfully launched snapstub server on: http://localhost:8059\n');
+			function validateRouteMsg() {
 				child.stdout.once('data', d => {
 					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data/\n');
 				});
-			});
+			}
+			function validateSuccessMsg() {
+				child.stdout.once('data', data => {
+					assert.equal(data.toString(), '✔  Successfully launched snapstub server on: http://localhost:8059\n');
+					validateRouteMsg();
+				});
+			}
+			validateSuccessMsg();
 			setTimeout(() => {
 				child.kill();
 				done(err);
