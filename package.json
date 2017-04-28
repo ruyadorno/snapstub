@@ -1,6 +1,6 @@
 {
   "name": "snapstub",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Snapshot-based stub/mocking of APIs",
   "main": "index.js",
   "bin": "index.js",
