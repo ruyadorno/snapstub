@@ -2,16 +2,15 @@
 
 const fs = require('fs');
 const path = require('path');
-const stubborn = require('stubborn-server');
 const out = require('simple-output');
 const globby = require('globby');
 const methods = require('methods');
 
 function startCmd(opts) {
-	const mockFolderName = opts.mockFolderName;
-	const port = opts.port;
+	const mockFolderName = opts.mockFolderName || '__mocks__';
+	const port = opts.port || 8059;
 	try {
-		stubborn.start({
+		opts.stubborn.start({
 			logMode: opts.verbose ? 'all' : 'warn',
 			namespace: '',
 			pathToMocks: mockFolderName,

@@ -19,6 +19,10 @@ Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog
 	- [Sending data read from a file](#sending-data-read-from-a-file)
 	- [Change defaults](#change-defaults)
 	- [More info](#more-info)
+- [Programmatic API](#programmatic-api)
+	- [add(opts)](#addopts)
+	- [start(opts)](#startopts)
+	- [stop()](#stop)
 - [Credit](#credit)
 - [Maintainers](#maintainers)
 - [Contribute](#contribute)
@@ -125,6 +129,58 @@ snapstub start
 By default snapshots will be saved in a `__mocks__` folder that resolves from the current working directory, so make sure you run the commands from the correct project folder you desire.
 
 NOTE: **v1.x** only supports `json` endpoints.
+
+<br/>
+
+## Programmatic API
+
+A JavaScript programmatic api is available if you're using node.js:
+
+```js
+const snapstub = require('snapstub');
+
+// starts the mock server
+snapstub.start({
+	verbose: true,
+	mockFolderName: '__mocks__',
+	port: 8080
+});
+```
+
+The following methods are available:
+
+### add(opts)
+
+```js
+snapstub.add({
+	url: 'http://example.com/api/v1/data',
+	addOptions: {
+		headers: {
+			'content-type': 'application/json',
+			'Cookie': 'FOO=bar;'
+		},
+		body: 'lorem=ipsum',
+		method: 'post'
+	},
+	mockFolderName: '__mocks__'
+});
+```
+
+### start(opts)
+
+```js
+snapstub.start({
+	verbose: true,
+	mockFolderName: '__mocks__',
+	port: 8080
+});
+```
+
+### stop()
+
+```js
+snapstub.stop();
+```
 
 <br/>
 

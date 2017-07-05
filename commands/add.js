@@ -11,15 +11,16 @@ const out = require('simple-output');
 const parseHeaders = require('parse-headers');
 
 function addCmd(opts) {
-	const argv = opts.argv;
-	const rootPath = opts.rootPath;
-	const url = argv._[1];
-	const methodList = argv.method || 'get';
+	const addOptions = opts.addOptions;
+	const mockFolderName = opts.mockFolderName || '__mocks__';
+	const rootPath = opts.rootPath || path.join(process.cwd(), mockFolderName);
+	const url = opts.url;
+	const methodList = addOptions.method || 'get';
 	const methods = methodList.split(',');
-	const customHeaders = [].concat(argv.header).join('\n');
+	const customHeaders = [].concat(addOptions.header).join('\n');
 
 	function getData() {
-		let data = argv.data;
+		let data = addOptions.data;
 		let body;
 		let type;
 
@@ -45,17 +46,17 @@ function addCmd(opts) {
 	function getOpts(method) {
 		let opts = {
 			headers: parseHeaders(customHeaders),
-			json: !argv.nojson,
+			json: !addOptions.nojson,
 			method: method
 		};
 
 		// set body data, skips only TRACE method
 		// https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
-		if (method !== 'trace' && argv.data) {
+		if (method !== 'trace' && addOptions.data) {
 			let data = getData();
 
 			// if no method was set using data, defaults to post
-			if (!argv.method) {
+			if (!addOptions.method) {
 				opts.method = 'post';
 			}
 
@@ -77,7 +78,7 @@ function addCmd(opts) {
 			const folderPath = path.join(rootPath, urlParse(url).pathname);
 			mkdirp.sync(folderPath);
 			methods.forEach((method, index) => {
-				const fileExt = argv.nojson ? '.js' : '.json';
+				const fileExt = addOptions.nojson ? '.js' : '.json';
 				const fileName = path.join(folderPath, method.trim() + fileExt);
 				fs.writeFileSync(fileName, jsonlint.formatter.formatJson(JSON.stringify(results[index].body)));
 				out.success(`Successfully added: ${fileName}`);

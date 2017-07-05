@@ -3,13 +3,14 @@
   "version": "2.1.0",
   "description": "Snapshot-based stub/mocking of APIs",
   "main": "index.js",
-  "bin": "index.js",
+  "bin": "cli.js",
   "files": [
     "index.js",
+    "cli.js",
     "commands/"
   ],
   "scripts": {
-    "lint": "eslint index.js commands/*.js test.js",
+    "lint": "eslint index.js cli.js commands/*.js test.js",
     "pretest": "npm run lint",
     "test": "mocha test.js"
   },
