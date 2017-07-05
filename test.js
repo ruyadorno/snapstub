@@ -41,7 +41,33 @@ express()
 	})
 	.listen(9194);
 
-describe('snapstub', function () {
+describe('snapstub api', function () {
+	const snapstub = require('./');
+
+	// mute stdout prints
+	const out = require('simple-output');
+	const _write = out.stdout.write;
+	out.stdout.write = a => a;
+
+	it('should correctly start a server', function (done) {
+		snapstub.start({
+			verbose: false,
+			mockFolderName: 'mocks'
+		});
+		request('http://localhost:8059')
+			.get('/data')
+			.expect(200)
+			.expect('Content-Type', /json/)
+			.expect(data)
+			.end(err => {
+				out.stdout.write = _write;
+				snapstub.stop();
+				done(err);
+			});
+	});
+});
+
+describe('snapstub cli', function () {
 	before(function (done) {
 		mkdirp(path.join(__dirname, '__mocks__'), done);
 	});
@@ -49,7 +75,7 @@ describe('snapstub', function () {
 		rimraf(path.join(__dirname, '__mocks__'), done);
 	});
 	it('should correctly save a snapshot', function (done) {
-		exec('./index.js add http://localhost:9194/data', (err, stdout) => {
+		exec('./cli.js add http://localhost:9194/data', (err, stdout) => {
 			if (err) {
 				done(err);
 			}
@@ -62,7 +88,7 @@ describe('snapstub', function () {
 		});
 	});
 	it('should correctly save many snapshot methods', function (done) {
-		exec('./index.js add http://localhost:9194/data --method=post,head', (err, stdout) => {
+		exec('./cli.js add http://localhost:9194/data --method=post,head', (err, stdout) => {
 			if (err) {
 				done(err);
 			}
@@ -87,7 +113,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec('./index.js add http://localhost:9195/data --header "X-Token: 0123F"', err => {
+				exec('./cli.js add http://localhost:9195/data --header "X-Token: 0123F"', err => {
 					if (err) {
 						done(err);
 					}
@@ -106,7 +132,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec('./index.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"', err => {
+				exec('./cli.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"', err => {
 					if (err) {
 						done(err);
 					}
@@ -128,7 +154,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec('./index.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'', err => { // eslint-disable-line no-useless-escape
+				exec('./cli.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'', err => { // eslint-disable-line no-useless-escape
 					if (err) {
 						done(err);
 					}
@@ -154,7 +180,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./index.js add http://localhost:9197/data --data '${JSON.stringify(bodyData)}'`, err => {
+				exec(`./cli.js add http://localhost:9197/data --data '${JSON.stringify(bodyData)}'`, err => {
 					if (err) {
 						done(err);
 					}
@@ -175,7 +201,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./index.js add http://localhost:9198/data --data "${bodyData}"`, err => {
+				exec(`./cli.js add http://localhost:9198/data --data "${bodyData}"`, err => {
 					if (err) {
 						done(err);
 					}
@@ -195,7 +221,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./index.js add http://localhost:9199/data --data "${bodyData}" --method=put`, err => {
+				exec(`./cli.js add http://localhost:9199/data --data "${bodyData}" --method=put`, err => {
 					if (err) {
 						done(err);
 					}
@@ -214,7 +240,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./index.js add http://localhost:9201/data --data ./fixtures/data`, err => {
+				exec(`./cli.js add http://localhost:9201/data --data ./fixtures/data`, err => {
 					if (err) {
 						done(err);
 					}
@@ -233,7 +259,7 @@ describe('snapstub', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./index.js add http://localhost:9202/data --data ./fixtures/data.json`, err => {
+				exec(`./cli.js add http://localhost:9202/data --data ./fixtures/data.json`, err => {
 					if (err) {
 						done(err);
 					}
@@ -242,11 +268,11 @@ describe('snapstub', function () {
 	});
 	it('should correctly retrieve snapshot data', function (done) {
 		this.timeout(6000);
-		exec('./index.js add http://localhost:9194/data', err => {
+		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
 				done(err);
 			}
-			const child = spawn('./index.js', ['start']);
+			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
@@ -255,20 +281,20 @@ describe('snapstub', function () {
 					.get('/data')
 					.expect('Content-Type', /json/)
 					.expect(data)
-					.end(() => { // eslint-disable-line
+					.end(error => { // eslint-disable-line
 						child.kill();
-						done(err);
+						done(err || error);
 					});
 			}, 2000);
 		});
 	});
 	it('should correctly retrieve snapshot data from post method', function (done) {
 		this.timeout(6000);
-		exec('./index.js add http://localhost:9194/data --method=post', err => {
+		exec('./cli.js add http://localhost:9194/data --method=post', err => {
 			if (err) {
 				done(err);
 			}
-			const child = spawn('./index.js', ['start']);
+			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
@@ -286,11 +312,11 @@ describe('snapstub', function () {
 	});
 	it('should correctly retrieve snapshot data from multiple http methods', function (done) {
 		this.timeout(6000);
-		exec('./index.js add http://localhost:9194/data --method=post,get,put', err => {
+		exec('./cli.js add http://localhost:9194/data --method=post,get,put', err => {
 			if (err) {
 				done(err);
 			}
-			const child = spawn('./index.js', ['start']);
+			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
@@ -308,11 +334,11 @@ describe('snapstub', function () {
 	});
 	it('should print route messages to console by default', function (done) {
 		this.timeout(6000);
-		exec('./index.js add http://localhost:9194/data', err => {
+		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
 				done(err);
 			}
-			const child = spawn('./index.js', ['start']);
+			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
@@ -336,11 +362,11 @@ describe('snapstub', function () {
 	});
 	it('should print messages to console when using --verbose option', function (done) {
 		this.timeout(6000);
-		exec('./index.js add http://localhost:9194/data', err => {
+		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
 				done(err);
 			}
-			const child = spawn('./index.js', ['start', '--verbose']);
+			const child = spawn('./cli.js', ['start', '--verbose']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
@@ -352,13 +378,13 @@ describe('snapstub', function () {
 		});
 	});
 	it('should get help message when using no valid command', function (done) {
-		exec('./index.js', (err, stdout) => {
+		exec('./cli.js', (err, stdout) => {
 			assert.strictEqual(stdout.indexOf('Usage:'), 1);
 			done(err);
 		});
 	});
 	it('should get version number when using --version flag', function (done) {
-		exec('./index.js --version', (err, stdout) => {
+		exec('./cli.js --version', (err, stdout) => {
 			assert.strictEqual(stdout.trim(), require('./package.json').version);
 			done(err);
 		});

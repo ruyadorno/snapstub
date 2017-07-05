@@ -1,33 +1,23 @@
-#!/usr/bin/env node
-
 'use strict';
 
-const path = require('path');
+const stubborn = require('stubborn-server');
 
-const argv = require('minimist')(process.argv.slice(2));
-const verbose = argv.verbose;
-const mockFolderName = process.env.SNAPSTUB_FOLDER_NAME || '__mocks__';
-const port = process.env.SNAPSTUB_PORT || 8059;
-const rootPath = path.join(process.cwd(), mockFolderName);
-const commandName = argv._[0];
-const commands = {
+module.exports = {
 	add: require('./commands/add'),
 	help: require('./commands/help'),
-	start: require('./commands/start'),
+	start: opts => {
+		// defines a default stubborn server value
+		const options = Object.assign({
+			stubborn: stubborn
+		}, opts);
+		// execs the start command
+		require('./commands/start')(options);
+		return stubborn;
+	},
+	stop: () => {
+		stubborn.stop();
+		return stubborn;
+	},
 	version: require('./commands/version')
 };
-
-if (commandName in commands) {
-	commands[commandName]({
-		argv: argv,
-		mockFolderName: mockFolderName,
-		port: port,
-		rootPath: rootPath,
-		verbose: verbose
-	});
-} else if (argv.version || argv.v) {
-	commands.version();
-} else {
-	commands.help();
-}
 
