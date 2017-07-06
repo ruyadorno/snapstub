@@ -377,6 +377,27 @@ describe('snapstub cli', function () {
 			});
 		});
 	});
+	it('should not print messages to console when using --silent option', function (done) {
+		this.timeout(6000);
+		exec('./cli.js add http://localhost:9194/data', err => {
+			if (err) {
+				done(err);
+			}
+			const child = spawn('./cli.js', ['start', '--silent']);
+			child.stderr.on('data', err => {
+				throw new Error(err.toString());
+			});
+			child.stdout.on('data', data => {
+				throw new Error(data);
+			});
+		});
+		setTimeout(() => {
+			request('http://localhost:8059')
+				.post('/data')
+				.expect(200);
+			done();
+		}, 2000);
+	});
 	it('should get help message when using no valid command', function (done) {
 		exec('./cli.js', (err, stdout) => {
 			assert.strictEqual(stdout.indexOf('Usage:'), 1);

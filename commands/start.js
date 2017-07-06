@@ -17,9 +17,11 @@ function startCmd(opts) {
 			servePort: port,
 			fallbacks: []
 		});
-		out.success('Successfully launched snapstub server on: ' +
-			'http://localhost:' + port);
-		printRoutes(mockFolderName, port);
+		if (!opts.silent) {
+			out.success('Successfully launched snapstub server on: ' +
+				'http://localhost:' + port);
+			printRoutes(mockFolderName, port);
+		}
 	} catch (e) {
 		out.error('Failed to launch snapstub server');
 	}

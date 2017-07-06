@@ -15,6 +15,7 @@ Options:
   --method     Specifies different http methods to use, defaults to GET
   --header     Adds a custom header to the request
   --verbose    Output debug info when used along with the start command
+  --silent     Mutes output when used along with the start command
 
 More info:
   https://github.com/ruyadorno/snapstub
