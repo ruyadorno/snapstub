@@ -5,6 +5,7 @@ const stubborn = require('stubborn-server');
 module.exports = {
 	add: require('./commands/add'),
 	help: require('./commands/help'),
+	save: require('./commands/save'),
 	start: opts => {
 		// defines a default stubborn server value
 		const options = Object.assign({

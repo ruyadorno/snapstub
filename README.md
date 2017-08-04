@@ -13,6 +13,7 @@ Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog
 - [Install](#install)
 - [Usage](#usage)
 - [Advanced Usage](#advanced-usage)
+	- [Saving standard input data into a new endpoint](#saving-standard-input-data-into-a-new-endpoint)
 	- [Using different http methods](#using-different-http-methods)
 	- [Using custom headers to add a new route](#using-custom-headers-to-add-a-new-route)
 	- [Sending data when adding a new route](#sending-data-when-adding-a-new-route)
@@ -21,6 +22,7 @@ Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog
 	- [More info](#more-info)
 - [Programmatic API](#programmatic-api)
 	- [add(opts)](#addopts)
+	- [save(opts)](#saveopts)
 	- [start(opts)](#startopts)
 	- [stop()](#stop)
 - [Credit](#credit)
@@ -59,6 +61,26 @@ snapstub start
 <br/>
 
 ## Advanced Usage
+
+### Saving standard input data into a new endpoint
+
+This is a very useful workflow that allows you to combine Chrome's **Copy as cURL** web dev tools option with the ability to store a snapstub route.
+
+```sh
+curl http://example.com/api/foo | snapstub save /api/foo
+```
+
+or you can just save any arbitrary data:
+
+```sh
+cat foo.json | snapstub save /api/foo # similar to $ cp foo.json __mocks__/api/foo
+```
+
+or even:
+
+```sh
+echo '{"data":true}' | snapstub save /api/foo
+```
 
 ### Using different http methods
 
@@ -160,6 +182,18 @@ snapstub.add({
 			'Cookie': 'FOO=bar;'
 		},
 		body: 'lorem=ipsum',
+		method: 'post'
+	},
+	mockFolderName: '__mocks__'
+});
+```
+
+### save(opts)
+
+```js
+snapstub.save({
+	url: '/api/v1/data',
+	saveOptions: {
 		method: 'post'
 	},
 	mockFolderName: '__mocks__'
