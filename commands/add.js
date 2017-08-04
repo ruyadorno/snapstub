@@ -1,19 +1,15 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 
-const jsonlint = require('jsonlint/lib/formatter');
-const mkdirp = require('mkdirp');
 const got = require('got');
-const urlParse = require('url-parse-lax');
 const out = require('simple-output');
 const parseHeaders = require('parse-headers');
 
+const saveCmd = require('./save');
+
 function addCmd(opts) {
 	const addOptions = opts.addOptions;
-	const mockFolderName = opts.mockFolderName || '__mocks__';
-	const rootPath = opts.rootPath || path.join(process.cwd(), mockFolderName);
 	const url = opts.url;
 	const methodList = addOptions.method || 'get';
 	const methods = methodList.split(',');
@@ -75,14 +71,14 @@ function addCmd(opts) {
 			methods.map(name => got(url, getOpts(name.toLowerCase())))
 		)
 		.then(results => {
-			const folderPath = path.join(rootPath, urlParse(url).pathname);
-			mkdirp.sync(folderPath);
-			methods.forEach((method, index) => {
-				const fileExt = addOptions.nojson ? '.js' : '.json';
-				const fileName = path.join(folderPath, method.trim() + fileExt);
-				fs.writeFileSync(fileName, jsonlint.formatter.formatJson(JSON.stringify(results[index].body)));
-				out.success(`Successfully added: ${fileName}`);
-			});
+			methods.forEach((method, index) => saveCmd({
+				url: url,
+				stdin: results[index].body,
+				saveOptions: {
+					method: method,
+					nojson: addOptions.nojson
+				}
+			}));
 		})
 		.catch(out.error);
 }

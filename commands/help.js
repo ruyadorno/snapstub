@@ -8,6 +8,7 @@ Usage:
 Available commands:
   help         Output usage info
   version      Get current version number
+  save         Saves data from stdin straight to a url location
   start        Starts the built-in static mock server
   add <url>    Takes a snapshot of a given url and stores in the local fs
 

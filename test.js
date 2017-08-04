@@ -85,7 +85,7 @@ describe('snapstub cli', function () {
 				`✔  Successfully added: ${expectedFileName}`
 			);
 			done();
-		});
+		}).stdin.end();
 	});
 	it('should correctly save many snapshot methods', function (done) {
 		exec('./cli.js add http://localhost:9194/data --method=post,head', (err, stdout) => {
@@ -100,7 +100,7 @@ describe('snapstub cli', function () {
 ✔  Successfully added: ${headExpectedFileName}`
 			);
 			done();
-		});
+		}).stdin.end();
 	});
 	it('should be able to set a custom header when adding snapshots', function (done) {
 		express()
@@ -117,7 +117,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to set multiple custom headers when adding snapshots', function (done) {
@@ -136,7 +136,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to POST simple json data', function (done) {
@@ -158,7 +158,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to POST json data', function (done) {
@@ -184,7 +184,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to POST form data', function (done) {
@@ -205,7 +205,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to PUT form data', function (done) {
@@ -225,7 +225,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to send from data file', function (done) {
@@ -244,7 +244,7 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should be able to send from json data file', function (done) {
@@ -263,19 +263,20 @@ describe('snapstub cli', function () {
 					if (err) {
 						done(err);
 					}
-				});
+				}).stdin.end();
 			});
 	});
 	it('should correctly retrieve snapshot data', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
-				done(err);
+				return done(err);
 			}
 			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
+			child.stdin.end();
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.get('/data')
@@ -286,18 +287,19 @@ describe('snapstub cli', function () {
 						done(err || error);
 					});
 			}, 2000);
-		});
+		}).stdin.end();
 	});
 	it('should correctly retrieve snapshot data from post method', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data --method=post', err => {
 			if (err) {
-				done(err);
+				return done(err);
 			}
 			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
+			child.stdin.end();
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.post('/data')
@@ -308,18 +310,19 @@ describe('snapstub cli', function () {
 						done(err);
 					});
 			}, 2000);
-		});
+		}).stdin.end();
 	});
 	it('should correctly retrieve snapshot data from multiple http methods', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data --method=post,get,put', err => {
 			if (err) {
-				done(err);
+				return done(err);
 			}
 			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
+			child.stdin.end();
 			setTimeout(() => {
 				request('http://localhost:8059')
 					.put('/data')
@@ -330,18 +333,19 @@ describe('snapstub cli', function () {
 						done(err);
 					});
 			}, 2000);
-		});
+		}).stdin.end();
 	});
 	it('should print route messages to console by default', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
-				done(err);
+				return done(err);
 			}
 			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
+			child.stdin.end();
 			function validateRouteMsg() {
 				child.stdout.once('data', d => {
 					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data/\n');
@@ -358,30 +362,31 @@ describe('snapstub cli', function () {
 				child.kill();
 				done(err);
 			}, 2000);
-		});
+		}).stdin.end();
 	});
 	it('should print messages to console when using --verbose option', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
-				done(err);
+				return done(err);
 			}
 			const child = spawn('./cli.js', ['start', '--verbose']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
 			});
+			child.stdin.end();
 			child.stdout.on('data', data => {
 				assert.notEqual(data.toString().split('pathToMocks'), -1);
 				child.kill();
 				done(err);
 			});
-		});
+		}).stdin.end();
 	});
 	it('should not print messages to console when using --silent option', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
 			if (err) {
-				done(err);
+				return done(err);
 			}
 			const child = spawn('./cli.js', ['start', '--silent']);
 			child.stderr.on('data', err => {
@@ -390,25 +395,107 @@ describe('snapstub cli', function () {
 			child.stdout.on('data', data => {
 				throw new Error(data);
 			});
+			child.stdin.end();
+			setTimeout(() => {
+				request('http://localhost:8059')
+					.post('/data')
+					.expect(200);
+				child.kill();
+				done();
+			}, 2000);
+		}).stdin.end();
+	});
+	it('should be able to save arbitrary endpoint data', function (done) {
+		this.timeout(6000);
+		const parent = exec('./cli.js save /foo', err => {
+			if (err) {
+				return done(err);
+			}
+			const child = spawn('./cli.js', ['start', '--silent']);
+			child.on('error', done);
+			child.stdin.end();
+			setTimeout(() => {
+				request('http://localhost:8059')
+					.get('/foo')
+					.expect(200)
+					.expect('Content-Type', /json/)
+					.expect({pork: true})
+					.end(err => { // eslint-disable-line
+						child.kill();
+						done(err);
+					});
+			}, 2000);
 		});
-		setTimeout(() => {
-			request('http://localhost:8059')
-				.post('/data')
-				.expect(200);
-			done();
-		}, 2000);
+		parent.stdin.write('{"pork":true}');
+		parent.stdin.end();
+	});
+	it('should be able to save to diff methods', function (done) {
+		this.timeout(6000);
+		const parent = exec('./cli.js save /foo --method=post', err => {
+			if (err) {
+				return done(err);
+			}
+			const child = spawn('./cli.js', ['start', '--silent']);
+			child.on('error', done);
+			child.stdin.end();
+			setTimeout(() => {
+				request('http://localhost:8059')
+					.post('/foo')
+					.expect(200)
+					.expect('Content-Type', /json/)
+					.end(err => { // eslint-disable-line
+						child.kill();
+						done(err);
+					});
+			}, 2000);
+		});
+		parent.stdin.write('{"pork":true}');
+		parent.stdin.end();
+	});
+	it('should be able to save to multiple methods', function (done) {
+		this.timeout(6000);
+		const parent = exec('./cli.js save /foo --method=post,put', err => {
+			if (err) {
+				return done(err);
+			}
+			const child = spawn('./cli.js', ['start', '--silent']);
+			child.on('error', done);
+			child.stdin.end();
+			setTimeout(() => {
+				request('http://localhost:8059')
+					.put('/foo')
+					.expect(200)
+					.expect('Content-Type', /json/)
+					.end(err => { // eslint-disable-line
+						if (err) {
+							child.kill();
+							done(err);
+						}
+						request('http://localhost:8059')
+							.post('/foo')
+							.expect(200)
+							.expect('Content-Type', /json/)
+							.end(err => { // eslint-disable-line
+								child.kill();
+								done(err);
+							});
+					});
+			}, 2000);
+		});
+		parent.stdin.write('{"pork":true}');
+		parent.stdin.end();
 	});
 	it('should get help message when using no valid command', function (done) {
 		exec('./cli.js', (err, stdout) => {
 			assert.strictEqual(stdout.indexOf('Usage:'), 1);
 			done(err);
-		});
+		}).stdin.end();
 	});
 	it('should get version number when using --version flag', function (done) {
 		exec('./cli.js --version', (err, stdout) => {
 			assert.strictEqual(stdout.trim(), require('./package.json').version);
 			done(err);
-		});
+		}).stdin.end();
 	});
 });
 

@@ -33,9 +33,9 @@
     "url": "ruyadorno.com"
   },
   "bugs": {
-    "url": "https://github.com/ruyadorno/tlr/issues"
+    "url": "https://github.com/ruyadorno/snapstub/issues"
   },
-  "homepage": "https://github.com/ruyadorno/tlr#readme",
+  "homepage": "https://github.com/ruyadorno/snapstub",
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.16.0",
@@ -47,6 +47,7 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
+    "get-stdin": "^5.0.1",
     "globby": "^6.1.0",
     "got": "^6.7.1",
     "jsonlint": "^1.6.2",
