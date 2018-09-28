@@ -201,7 +201,7 @@ describe('snapstub cli', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./cli.js add http://localhost:9198/data --data "${bodyData}"`, err => {
+				exec(`./cli.js add http://localhost:9198/data --data "${bodyData}" --verbose`, err => {
 					if (err) {
 						done(err);
 					}

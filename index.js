@@ -1,6 +1,7 @@
 'use strict';
 
-const stubborn = require('stubborn-server');
+const stubbornServer = require('stubborn-server');
+const stubborn = stubbornServer();
 
 module.exports = {
 	add: require('./commands/add'),

@@ -47,16 +47,17 @@
     "supertest": "^2.0.1"
   },
   "dependencies": {
-    "get-stdin": "^5.0.1",
-    "globby": "^6.1.0",
-    "got": "^6.7.1",
+    "get-stdin": "^6.0.0",
+    "globby": "^8.0.1",
+    "got": "^9.2.2",
     "jsonlint": "^1.6.2",
     "methods": "^1.1.2",
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
     "parse-headers": "^2.0.1",
+    "query-string": "^6.1.0",
     "simple-output": "^1.0.0",
-    "stubborn-server": "^0.8.2",
-    "url-parse-lax": "^1.0.0"
+    "stubborn-server": "^1.0.1",
+    "url-parse-lax": "^3.0.0"
   }
 }
