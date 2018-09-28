@@ -44,7 +44,7 @@ express()
 describe('snapstub api', function () {
 	const snapstub = require('./');
 
-	// mute stdout prints
+	// Mute stdout prints
 	const out = require('simple-output');
 	const _write = out.stdout.write;
 	out.stdout.write = a => a;
@@ -201,7 +201,7 @@ describe('snapstub cli', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./cli.js add http://localhost:9198/data --data "${bodyData}"`, err => {
+				exec(`./cli.js add http://localhost:9198/data --data "${bodyData}" --verbose`, err => {
 					if (err) {
 						done(err);
 					}
@@ -240,7 +240,7 @@ describe('snapstub cli', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./cli.js add http://localhost:9201/data --data ./fixtures/data`, err => {
+				exec('./cli.js add http://localhost:9201/data --data ./fixtures/data', err => {
 					if (err) {
 						done(err);
 					}
@@ -259,7 +259,7 @@ describe('snapstub cli', function () {
 				if (e) {
 					done(e);
 				}
-				exec(`./cli.js add http://localhost:9202/data --data ./fixtures/data.json`, err => {
+				exec('./cli.js add http://localhost:9202/data --data ./fixtures/data.json', err => {
 					if (err) {
 						done(err);
 					}

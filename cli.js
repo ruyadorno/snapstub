@@ -35,7 +35,7 @@ function executeCmd(stdin) {
 getStdin()
 	.then(executeCmd)
 	.catch(() => {
-		// stdin is only required for save
+		// Stdin is only required for save
 		if (commandName === 'save') {
 			out.error('Could not read from stdin');
 			process.exit(1);

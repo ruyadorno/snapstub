@@ -1,17 +1,18 @@
 'use strict';
 
-const stubborn = require('stubborn-server');
+const stubbornServer = require('stubborn-server');
+const stubborn = stubbornServer();
 
 module.exports = {
 	add: require('./commands/add'),
 	help: require('./commands/help'),
 	save: require('./commands/save'),
 	start: opts => {
-		// defines a default stubborn server value
+		// Defines a default stubborn server value
 		const options = Object.assign({
 			stubborn: stubborn
 		}, opts);
-		// execs the start command
+		// Execs the start command
 		require('./commands/start')(options);
 		return stubborn;
 	},
