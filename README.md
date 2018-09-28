@@ -1,6 +1,8 @@
 # snapstub
 
-[![NPM version](https://badge.fury.io/js/snapstub.svg)](https://npmjs.org/package/snapstub) [![Build Status](https://travis-ci.org/ruyadorno/snapstub.svg?branch=master)](https://travis-ci.org/ruyadorno/snapstub)
+[![NPM version](https://badge.fury.io/js/snapstub.svg)](https://npmjs.org/package/snapstub)
+[![Build Status](https://travis-ci.org/ruyadorno/snapstub.svg?branch=master)](https://travis-ci.org/ruyadorno/snapstub)
+[![License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://raw.githubusercontent.com/ruyadorno/snapstub/master/LICENSE)
 
 > Snapshot-based stub/mocking of APIs
 
