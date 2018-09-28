@@ -21,10 +21,10 @@ function saveCmd(opts) {
 	methods.forEach(method => {
 		const fileName = path.join(folderPath, method.trim() + fileExt);
 
-		// creates mocks folder
+		// Creates mocks folder
 		mkdirp.sync(folderPath);
 
-		// writes mock file
+		// Writes mock file
 		fs.writeFileSync(fileName, jsonlint.formatter.formatJson(stdin));
 		out.success(`Successfully added: ${fileName}`);
 	});
