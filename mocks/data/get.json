@@ -3,6 +3,7 @@
 	"lorem": "Ipsum",
 	"a": {
 		"b": "c"
-	}
+	},
+	"query": {}
 }
 

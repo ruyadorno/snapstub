@@ -6,8 +6,7 @@ const getStdin = require('get-stdin');
 const out = require('simple-output');
 
 const argv = require('minimist')(process.argv.slice(2));
-const verbose = argv.verbose;
-const silent = argv.silent;
+const {debug, silent, verbose} = argv;
 const mockFolderName = process.env.SNAPSTUB_FOLDER_NAME;
 const port = process.env.SNAPSTUB_PORT;
 const commandName = argv._[0];
@@ -34,9 +33,12 @@ function executeCmd(stdin) {
 
 getStdin()
 	.then(executeCmd)
-	.catch(() => {
+	.catch(e => {
+		if (debug) {
+			console.error(e);
+			process.exit(1);
 		// Stdin is only required for save
-		if (commandName === 'save') {
+		} else if (commandName === 'save') {
 			out.error('Could not read from stdin');
 			process.exit(1);
 		} else {
