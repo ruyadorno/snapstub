@@ -25,6 +25,9 @@
     "snapstub",
     "api",
     "test",
+    "hash",
+    "request-hash",
+    "deterministic",
     "stubborn",
     "stubborn-server"
   ],
