@@ -23,6 +23,7 @@ Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog
 - [Advanced Usage](#advanced-usage)
 	- [Using different http methods](#using-different-http-methods)
 	- [Using custom headers to add a new route](#using-custom-headers-to-add-a-new-route)
+	- [Using html or plain text](#using-html-or-plain-text)
 	- [Sending data when adding a new route](#sending-data-when-adding-a-new-route)
 	- [Sending data read from a file](#sending-data-read-from-a-file)
 	- [Deterministic mocks using query-string or headers](#deterministic-mocks-using-query-string-or-headers)
@@ -91,6 +92,14 @@ You can set as many custom headers as you need:
 
 ```sh
 snapstub add http://example.com/api/login --header "X-User: foo" --header "X-Token: bar"
+```
+
+### Using html or plain text
+
+In order to save or add a html or plain text endpoint a `--nojson` flag must be specified in order to bypass json encode/decode:
+
+```sh
+snapstub add http://example.com/html --nojson
 ```
 
 ### Sending data when adding a new route
