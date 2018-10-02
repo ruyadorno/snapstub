@@ -406,7 +406,7 @@ describe('snapstub cli', function () {
 			child.stdin.end();
 			function validateRouteMsg() {
 				child.stdout.once('data', d => {
-					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data/\n');
+					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data\n');
 				});
 			}
 			function validateSuccessMsg() {

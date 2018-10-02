@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const out = require('simple-output');
 const globby = require('globby');
 const methods = require('methods');
@@ -37,28 +35,19 @@ function startCmd(opts) {
 	}
 }
 function printRoutes(srcPath, port) {
-	globby('**/', {cwd: srcPath})
+	const patterns = methods.map(m => `**/${m}.+(json|js)`);
+
+	globby(patterns, {cwd: srcPath})
 		.then(paths => {
-			paths.forEach(pathName => {
-				if (methods.some(method => {
-					const fileLocation = path.join(srcPath, pathName, method);
-					return [
-						`${fileLocation}.js`,
-						`${fileLocation}.json`
-					].some(fileName => {
-						try {
-							fs.accessSync(fileName, fs.constants.R_OK);
-							return true;
-						} catch (err) {
-							return false;
-						}
-					});
-				})) {
-					out.info(`http://localhost:${port}/${pathName}`);
-				}
+			const routes = paths.map(p => {
+				// Remove filename from path
+				const directoryPath = p.substring(0, p.lastIndexOf('/'));
+				return `http://localhost:${port}/${directoryPath}`;
 			});
-		})
-		.catch(out.error);
+			for (let route of new Set(routes)) {
+				out.info(route);
+			}
+		});
 }
 
 module.exports = startCmd;
