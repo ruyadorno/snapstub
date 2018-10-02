@@ -1,3 +1,11 @@
+<div align="center">
+	<br>
+	<br>
+	<img width="480" height="480" src="https://cdn.rawgit.com/ruyadorno/snapstub/add-support-to-deterministic-responses/logo.svg" alt="snapstub logo">
+	<br>
+	<br>
+</div>
+
 # snapstub
 
 [![NPM version](https://badge.fury.io/js/snapstub.svg)](https://npmjs.org/package/snapstub)
@@ -147,7 +155,7 @@ Deterministic results for query strings in the urls is active by default, for **
 
 ```sh
 snapstub add http://example.com/api/user/42 --header "X-Token: 1234" --hashHeaders=x-token
-✔  Successfully added: /Users/username/project/__mocks__/api/user/42/get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json
+✔  Successfully added: __mocks__/api/user/42/get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json
 ```
 
 Both `--hashHeaders` and `--hashCookies` accepts a comma-separated list of keys.
@@ -228,7 +236,7 @@ snapstub.save({
 
 ```js
 snapstub.start({
-	hashAlgorithm: sha256',
+	hashAlgorithm: 'sha256',
 	hashHeaders: ['x-foo'],
 	hashCookies: [],
 	verbose: true,
@@ -247,7 +255,8 @@ snapstub.stop();
 
 ## Credit
 
-**snapstub** wouldn't be possible without [stubborn-server](https://github.com/zeachco/stubborn-server) - it's a very flexible mock server based on static files, if you have the need to handle more complex scenarios (handling route params, dynamic responses, etc) go take a look at it.
+- Logo: **Camera** by Simon Child from the Noun Project
+- **snapstub** wouldn't be possible without [stubborn-server](https://github.com/zeachco/stubborn-server) - it's a very flexible mock server based on static files, if you have the need to handle more complex scenarios (handling route params, dynamic responses, etc) go take a look at it.
 
 ## Maintainers
 
