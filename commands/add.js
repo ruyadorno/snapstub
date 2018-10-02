@@ -51,7 +51,7 @@ function addCmd({addOptions, mockFolderName, url}) {
 		let opts = {
 			headers: parseHeaders(customHeaders),
 			json: !addOptions.nojson,
-			method: method
+			method: method.trim().toLowerCase()
 		};
 
 		// Set body data, skips only TRACE method
@@ -82,17 +82,13 @@ function addCmd({addOptions, mockFolderName, url}) {
 	const reqs = (addOptions.method || 'get')
 		.split(',')
 		.filter(Boolean)
-		.map(name => name.trim().toLowerCase())
-		.map(name => Object.assign({
-			methodName: name,
-			opts: getOpts(name)
-		}));
+		.map(name => getOpts(name));
 
 	Promise.all(
-		reqs.map(({opts}) => got(url, opts))
+		reqs.map(opts => got(url, opts))
 	)
 		.then(results => {
-			reqs.forEach(({methodName, opts}, index) => saveCmd({
+			reqs.forEach((opts, index) => saveCmd({
 				mockFolderName,
 				url: url,
 				stdin: results[index].body,
@@ -102,7 +98,8 @@ function addCmd({addOptions, mockFolderName, url}) {
 					hashCookies: addOptions.hashCookies,
 					data: opts.body,
 					headers: opts.headers,
-					method: methodName,
+					method: opts.method,
+					nohash: addOptions.nohash,
 					nojson: addOptions.nojson
 				}
 			}));

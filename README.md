@@ -15,11 +15,12 @@ Heavily inspired by [Jest Snapshot testing](https://facebook.github.io/jest/blog
 - [Install](#install)
 - [Usage](#usage)
 - [Advanced Usage](#advanced-usage)
-	- [Saving standard input data into a new endpoint](#saving-standard-input-data-into-a-new-endpoint)
 	- [Using different http methods](#using-different-http-methods)
 	- [Using custom headers to add a new route](#using-custom-headers-to-add-a-new-route)
 	- [Sending data when adding a new route](#sending-data-when-adding-a-new-route)
 	- [Sending data read from a file](#sending-data-read-from-a-file)
+	- [Deterministic mocks using query-string or headers](#deterministic-mocks-using-query-string-or-headers)
+	- [Saving standard input data into a new endpoint](#saving-standard-input-data-into-a-new-endpoint)
 	- [Change defaults](#change-defaults)
 	- [More info](#more-info)
 - [Programmatic API](#programmatic-api)
@@ -63,26 +64,6 @@ snapstub start
 <br/>
 
 ## Advanced Usage
-
-### Saving standard input data into a new endpoint
-
-This is a very useful workflow that allows you to combine Chrome's **Copy as cURL** web dev tools option with the ability to store a snapstub route.
-
-```sh
-curl http://example.com/api/foo | snapstub save /api/foo
-```
-
-or you can just save any arbitrary data:
-
-```sh
-cat foo.json | snapstub save /api/foo # similar to $ cp foo.json __mocks__/api/foo
-```
-
-or even:
-
-```sh
-echo '{"data":true}' | snapstub save /api/foo
-```
 
 ### Using different http methods
 
@@ -138,6 +119,43 @@ snapstub add http://example.com/api/user/add --data ./payload.json
 
 Headers will be automatically added and the content will be exactly as read from the file.
 
+### Saving standard input data into a new endpoint
+
+This is a very useful workflow that allows you to combine Chrome's **Copy as cURL** web dev tools option with the ability to store a snapstub route.
+
+```sh
+curl http://example.com/api/foo | snapstub save /api/foo
+```
+
+or you can just save any arbitrary data:
+
+```sh
+cat foo.json | snapstub save /api/foo # similar to $ cp foo.json __mocks__/api/foo
+```
+
+or even:
+
+```sh
+echo '{"data":true}' | snapstub save /api/foo
+```
+
+### Deterministic mocks using query-string or headers
+
+**snapstub** provides out of the box support to deterministic mocking by using query-string, headers, cookies thanks to [request-hash](https://github.com/ruyadorno/request-hash). Deterministic results for those cases will create a file name suffixed by a unique hash which **snapstub** uses in order to serve the correct value when using the `snapstub start` server.
+
+Deterministic results for query strings in the urls is active by default, for **headers** or **cookies** however you'll need to configure which values you'll want to use in order to create the unique hash. It can be set using the `--hashHeaders` or `--hashCookies` options:
+
+```sh
+snapstub add http://example.com/api/user/42 --header "X-Token: 1234" --hashHeaders=x-token
+✔  Successfully added: /Users/username/project/__mocks__/api/user/42/get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json
+```
+
+Both `--hashHeaders` and `--hashCookies` accepts a comma-separated list of keys.
+
+#### Customizing hash algorithm
+
+The algorithm used to create the unique hash can also be customized using the `--hashAlgorithm` option.
+
 ### Change defaults
 
 Using custom port and/or folder name:
@@ -151,8 +169,6 @@ snapstub start
 ### More info
 
 By default snapshots will be saved in a `__mocks__` folder that resolves from the current working directory, so make sure you run the commands from the correct project folder you desire.
-
-NOTE: **v1.x** only supports `json` endpoints.
 
 <br/>
 
@@ -171,7 +187,7 @@ snapstub.start({
 });
 ```
 
-The following methods are available:
+The following methods are available, please note all values used are just example values meant to ilustrate a common usage:
 
 ### add(opts)
 
@@ -196,7 +212,13 @@ snapstub.add({
 snapstub.save({
 	url: '/api/v1/data',
 	saveOptions: {
-		method: 'post'
+		data: { foo: 'bar' },
+		headers: { 'X-Foo': 'bar' },
+		hashAlgorithm: 'sha256',
+		hashHeaders: ['x-foo'],
+		hashCookies: [],
+		method: 'post',
+		nojson: false
 	},
 	mockFolderName: '__mocks__'
 });
@@ -206,6 +228,9 @@ snapstub.save({
 
 ```js
 snapstub.start({
+	hashAlgorithm: sha256',
+	hashHeaders: ['x-foo'],
+	hashCookies: [],
 	verbose: true,
 	mockFolderName: '__mocks__',
 	port: 8080
@@ -234,4 +259,4 @@ Please do! This is an open source project. If you would like a feature, open a p
 
 ## License
 
-[MIT](LICENSE) © 2017 [Ruy Adorno](http://ruyadorno.com)
+[MIT](LICENSE) © [Ruy Adorno](http://ruyadorno.com)

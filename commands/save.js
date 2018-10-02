@@ -13,25 +13,24 @@ function saveCmd(opts) {
 	const getOpts = arr => (arr && arr.split(',').filter(Boolean).map(i => i.trim())) || [];
 
 	const {query, pathname} = urlParse(url || '', true);
-	const {data, headers, hashAlgorithm, hashHeaders, hashCookies} = saveOptions;
+	const {data, headers, hashAlgorithm, hashHeaders, hashCookies, method, nohash, nojson} = saveOptions;
 	const hashHeadersOpts = getOpts(hashHeaders);
 	const hashCookiesOpts = getOpts(hashCookies);
 	const shouldHash = data ||
 		Object.keys(query).length > 0 ||
-		(headers && headers.length > 0 && (
+		(headers && Object.keys(headers).length > 0 && (
 			(hashHeadersOpts && hashHeadersOpts.length > 0) ||
 			(hashCookiesOpts && hashCookiesOpts.length > 0)
 		));
 
-	const methodList = saveOptions.method || 'get';
-	const methods = methodList.split(',');
+	const methods = (method || 'get').split(',');
 	const mockFolderName = opts.mockFolderName || '__mocks__';
 	const rootPath = opts.rootPath || path.join(process.cwd(), mockFolderName);
 	const folderPath = path.join(rootPath, pathname);
-	const fileExt = saveOptions.nojson ? '.js' : '.json';
+	const fileExt = nojson ? '.js' : '.json';
 
 	methods.forEach(method => {
-		const hashSuffix = shouldHash ?
+		const hashSuffix = !nohash && shouldHash ?
 			'-' + requestHash({
 				algorithm: hashAlgorithm,
 				headers: hashHeadersOpts,
