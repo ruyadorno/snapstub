@@ -29,6 +29,9 @@ const putData = {
 };
 
 express()
+	.get('/html', (req, res) => {
+		res.send('<html><body><h1>Hello world</h1></body></html>');
+	})
 	.get('/data', (req, res) => {
 		res.json(Object.assign({},
 			data,
@@ -378,6 +381,14 @@ describe('snapstub cli', function () {
 					lorem: 'ipsum'
 				}
 			}))
+	}));
+
+	it('should be able to save and retrieve specific text based responses using --nojson option', runAndLoadMockTest({
+		cmd: './cli.js add http://localhost:9194/html --nojson',
+		supertests: () => request('http://localhost:8059')
+			.get('/html')
+			.expect('Content-Type', /text/)
+			.expect('<html><body><h1>Hello world</h1></body></html>')
 	}));
 
 	// ---

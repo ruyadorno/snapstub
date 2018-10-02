@@ -17,6 +17,7 @@ Options:
   --method         Specifies http method to use along with add|save command
   --header         Adds a custom header to the request for add|save command
   --nohash         Don't generate hashed-filenames on add|save command
+  --nojson         Allow for saving html|text only on add|save command
   --hashAlgorithm  Algorithm to be used for deterministic responses
   --hashHeaders    Comma-separated list of header keys to be used on hash
   --hashCookies    Comma-separated list of cookies keys to be used on hash
