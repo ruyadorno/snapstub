@@ -5,6 +5,7 @@ const path = require('path');
 const out = require('simple-output');
 const globby = require('globby');
 const methods = require('methods');
+const hashLoader = require('stubborn-server-hash-loader');
 
 function startCmd(opts) {
 	const mockFolderName = opts.mockFolderName || '__mocks__';
@@ -15,7 +16,16 @@ function startCmd(opts) {
 			namespace: '',
 			pathToMocks: mockFolderName,
 			servePort: port,
-			fallbacks: []
+			fallbacks: [],
+			plugins: [
+				{
+					loader: hashLoader({
+						algorithm: opts.hashAlgorithm,
+						headers: opts.hashHeaders || [],
+						cookies: opts.hashCookies || []
+					})
+				}
+			]
 		});
 		if (!opts.silent) {
 			out.success('Successfully launched snapstub server on: ' +

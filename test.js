@@ -3,9 +3,7 @@
 'use strict';
 
 const assert = require('assert');
-const p = require('child_process');
-const exec = p.exec;
-const spawn = p.spawn;
+const {exec, spawn} = require('child_process');
 const path = require('path');
 const rimraf = require('rimraf');
 const mkdirp = require('mkdirp');
@@ -18,7 +16,8 @@ const data = {
 	lorem: 'Ipsum',
 	a: {
 		b: 'c'
-	}
+	},
+	query: {}
 };
 
 const postData = {
@@ -31,7 +30,10 @@ const putData = {
 
 express()
 	.get('/data', (req, res) => {
-		res.json(data);
+		res.json(Object.assign({},
+			data,
+			{query: req.query}
+		));
 	})
 	.post('/data', (req, res) => {
 		res.json(postData);
@@ -68,273 +70,318 @@ describe('snapstub api', function () {
 });
 
 describe('snapstub cli', function () {
+	function runOnly({
+		cmd,
+		expected
+	}) {
+		return function (done) {
+			exec(cmd, (err, stdout) => {
+				if (err) {
+					done(err);
+				}
+				assert.strictEqual(stdout.trim(), expected);
+				done();
+			}).stdin.end();
+		};
+	}
+
+	function runMockTest({
+		cmd,
+		port,
+		method,
+		middleware,
+		test
+	}) {
+		return function (done) {
+			const emptyMiddleware = (a, b, n) => {
+				n();
+			};
+			express()
+				.use(middleware || emptyMiddleware)[method]('/data', (req, res) => {
+					test(req, res);
+					done();
+				})
+				.listen(port, e => {
+					if (e) {
+						done(e);
+					}
+					exec(cmd, err => {
+						if (err) {
+							done(err);
+						}
+					}).stdin.end();
+				});
+		};
+	}
+
+	function runAndLoadMockTest({
+		cmd,
+		debug,
+		supertests,
+		stdinWrite
+	}) {
+		return function (done) {
+			this.timeout(6000);
+			const p = exec(`${cmd}${debug ? ' --debug' : ''}`, (err, stdout) => {
+				if (debug) {
+					console.log(stdout);
+				}
+				if (err) {
+					return done(err);
+				}
+				const child = spawn('./cli.js', ['start']);
+				if (debug) {
+					child.stdout.on('data', i => console.log(i.toString()));
+				}
+				child.stderr.on('data', err => {
+					throw new Error(err.toString());
+				});
+				child.stdin.end();
+				setTimeout(() => {
+					supertests()
+						.end(err => {
+							child.kill();
+							done(err);
+						});
+				}, 2000);
+			});
+			if (stdinWrite) {
+				p.stdin.write(stdinWrite);
+			}
+			p.stdin.end();
+		};
+	}
+
 	before(function (done) {
 		mkdirp(path.join(__dirname, '__mocks__'), done);
 	});
+
 	after(function (done) {
 		rimraf(path.join(__dirname, '__mocks__'), done);
 	});
-	it('should correctly save a snapshot', function (done) {
-		exec('./cli.js add http://localhost:9194/data', (err, stdout) => {
-			if (err) {
-				done(err);
-			}
-			const expectedFileName = path.join(__dirname, '__mocks__', 'data', 'get.json');
-			assert.strictEqual(
-				stdout.trim(),
-				`✔  Successfully added: ${expectedFileName}`
-			);
-			done();
-		}).stdin.end();
-	});
-	it('should correctly save many snapshot methods', function (done) {
-		exec('./cli.js add http://localhost:9194/data --method=post,head', (err, stdout) => {
-			if (err) {
-				done(err);
-			}
-			const postExpectedFileName = path.join(__dirname, '__mocks__', 'data', 'post.json');
-			const headExpectedFileName = path.join(__dirname, '__mocks__', 'data', 'head.json');
-			assert.strictEqual(
-				stdout.trim(),
-				`✔  Successfully added: ${postExpectedFileName}
-✔  Successfully added: ${headExpectedFileName}`
-			);
-			done();
-		}).stdin.end();
-	});
-	it('should be able to set a custom header when adding snapshots', function (done) {
-		express()
-			.get('/data', (req, res) => {
-				assert.strictEqual(req.get('X-Token'), '0123F');
-				res.sendStatus(200);
-				done();
+
+	// RunOnly
+
+	it('should correctly save a snapshot', runOnly({
+		cmd: './cli.js add http://localhost:9194/data',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`
+	}));
+
+	it('should correctly save many snapshot methods', runOnly({
+		cmd: './cli.js add http://localhost:9194/data --method=post,head',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'post.json')}
+✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'head.json')}`
+	}));
+
+	it('should correctly save query param using hashed filename', runOnly({
+		cmd: './cli.js add http://localhost:9194/data?foo=bar',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e86365266e9e38d9a280c46142e665acbb2a262a9a00281be4a41309b678e952.json')}`
+	}));
+
+	it('should correctly save using hashAlgorithm option', runOnly({
+		cmd: './cli.js add http://localhost:9194/data?foo=bar --hashAlgorithm=md5',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e198fcea7ddae86f20d9844a2243b714.json')}`
+	}));
+
+	it('should correctly save using hashHeaders option', runOnly({
+		cmd: './cli.js add http://localhost:9194/data --hashHeaders=content-type --header="Content-Type: application/json"',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-f83d19fbff806055593a9369c72c591d49b830bae4b2621709eb806f267ff63d.json')}`
+	}));
+
+	it('should correctly save using multiple hashHeaders option', runOnly({
+		cmd: './cli.js add http://localhost:9194/data --hashHeaders=content-type,x-foo --header="Content-Type: application/json" --header="X-Foo: bar"',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json')}`
+	}));
+
+	it('should correctly filter cookies using hashCookies option', runOnly({
+		cmd: './cli.js add http://localhost:9194/data --hashCookies=foo,bar --header="Cookie: foo=foo; bar=bar; lorem=lorem" --header="X-Foo: bar"',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b6b48a0dfb604db54f3f559ff763e640a32e90f4ca12f33d68f3e80ab284f9b4.json')}`
+	}));
+
+	it('should skip hash when using nohash option', runOnly({
+		cmd: './cli.js add http://localhost:9194/data --hashCookies=foo,bar --header="Cookie: foo=foo; bar=bar; lorem=lorem" --header="X-Foo: bar" --nohash',
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`
+	}));
+
+	// ---
+
+	// RunMockTest
+
+	it('should be able to set a custom header when adding snapshots', runMockTest({
+		cmd: './cli.js add http://localhost:9195/data --header "X-Token: 0123F"',
+		method: 'get',
+		port: 9195,
+		test: (req, res) => {
+			assert.strictEqual(req.get('X-Token'), '0123F');
+			res.sendStatus(200);
+		}
+	}));
+
+	it('should be able to set multiple custom headers when adding snapshots', runMockTest({
+		cmd: './cli.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"',
+		method: 'get',
+		port: 9196,
+		test: (req, res) => {
+			assert.strictEqual(req.get('X-Foo'), 'bar');
+			assert.strictEqual(req.get('X-Token'), '0123F');
+			res.sendStatus(200);
+		}
+	}));
+
+	it('should be able to POST simple json data', runMockTest({
+		cmd: './cli.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'', // eslint-disable-line no-useless-escape
+		method: 'post',
+		middleware: bodyParser.json(),
+		port: 9200,
+		test: (req, res) => {
+			assert.deepStrictEqual(req.body, {foo: 'Bar'});
+			res.sendStatus(200);
+		}
+	}));
+
+	it('should be able to POST json data', (bodyData => runMockTest({
+		cmd: `./cli.js add http://localhost:9197/data --data '${JSON.stringify(bodyData)}'`,
+		method: 'post',
+		middleware: bodyParser.json(),
+		port: 9197,
+		test: (req, res) => {
+			assert.deepStrictEqual(req.body, bodyData);
+			res.sendStatus(200);
+		}
+	}))({
+		foo: 'bar',
+		more: {
+			lorem: 'ipsum',
+			dolor: 'sit'
+		}
+	}));
+
+	it('should be able to POST form data', runMockTest({
+		cmd: './cli.js add http://localhost:9198/data --data "parameter=value&also=another" --verbose',
+		method: 'post',
+		middleware: bodyParser.urlencoded({extended: true}),
+		port: 9198,
+		test: (req, res) => {
+			assert.strictEqual(req.body.parameter, 'value');
+			assert.strictEqual(req.body.also, 'another');
+			res.sendStatus(200);
+		}
+	}));
+
+	it('should be able to PUT form data', runMockTest({
+		cmd: './cli.js add http://localhost:9199/data --data "parameter=something" --method=put',
+		method: 'put',
+		middleware: bodyParser.urlencoded({extended: true}),
+		port: 9199,
+		test: (req, res) => {
+			assert.strictEqual(req.body.parameter, 'something');
+			res.sendStatus(200);
+		}
+	}));
+
+	it('should be able to send from data file', runMockTest({
+		cmd: './cli.js add http://localhost:9201/data --data ./fixtures/data',
+		method: 'post',
+		middleware: bodyParser.urlencoded({extended: true}),
+		port: 9201,
+		test: (req, res) => {
+			assert.strictEqual(req.body.dolor.trim(), 'sit');
+			res.sendStatus(200);
+		}
+	}));
+
+	it('should be able to send from json data file', runMockTest({
+		cmd: './cli.js add http://localhost:9202/data --data ./fixtures/data.json',
+		method: 'post',
+		middleware: bodyParser.json(),
+		port: 9202,
+		test: (req, res) => {
+			assert.strictEqual(req.body.foo, 'Lorem');
+			res.sendStatus(200);
+		}
+	}));
+
+	// ---
+
+	// RunAndLoadMockTest
+
+	it('should correctly retrieve snapshot data', runAndLoadMockTest({
+		cmd: './cli.js add http://localhost:9194/data',
+		supertests: () => request('http://localhost:8059')
+			.get('/data')
+			.expect('Content-Type', /json/)
+			.expect(data)
+	}));
+
+	it('should correctly retrieve snapshot data from post method', runAndLoadMockTest({
+		cmd: './cli.js add http://localhost:9194/data --method=post',
+		supertests: () => request('http://localhost:8059')
+			.post('/data')
+			.expect('Content-Type', /json/)
+			.expect(postData)
+	}));
+
+	it('should correctly retrieve snapshot data from multiple http methods', runAndLoadMockTest({
+		cmd: './cli.js add http://localhost:9194/data --method=post,get,put',
+		supertests: () => request('http://localhost:8059')
+			.put('/data')
+			.expect('Content-Type', /json/)
+			.expect(putData)
+	}));
+
+	it('should be able to save arbitrary endpoint data', runAndLoadMockTest({
+		cmd: './cli.js save /foo',
+		supertests: () => request('http://localhost:8059')
+			.get('/foo')
+			.expect(200)
+			.expect('Content-Type', /json/)
+			.expect({pork: true}),
+		stdinWrite: '{"pork":true}'
+	}));
+
+	it('should be able to save to diff methods', runAndLoadMockTest({
+		cmd: './cli.js save /foo --method=post',
+		supertests: () => request('http://localhost:8059')
+			.post('/foo')
+			.expect(200)
+			.expect('Content-Type', /json/),
+		stdinWrite: '{"pork":true}'
+	}));
+
+	it('should be able to save and retrieve specific added endpoint using query string parameters', runAndLoadMockTest({
+		cmd: './cli.js add http://localhost:9194/data?msg=lorem%20ipsum',
+		supertests: () => request('http://localhost:8059')
+			.get('/data')
+			.query({
+				msg: 'lorem ipsum'
 			})
-			.listen(9195, e => {
-				if (e) {
-					done(e);
+			.expect('Content-Type', /json/)
+			.expect(Object.assign({}, data, {
+				query: {
+					msg: 'lorem ipsum'
 				}
-				exec('./cli.js add http://localhost:9195/data --header "X-Token: 0123F"', err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to set multiple custom headers when adding snapshots', function (done) {
-		express()
-			.get('/data', (req, res) => {
-				assert.strictEqual(req.get('X-Foo'), 'bar');
-				assert.strictEqual(req.get('X-Token'), '0123F');
-				res.sendStatus(200);
-				done();
+			}))
+	}));
+
+	it('should be able to save and retrieve specific added endpoint using multiple query string parameters', runAndLoadMockTest({
+		cmd: './cli.js add http://localhost:9194/data?foo=bar\\&lorem=ipsum',
+		supertests: () => request('http://localhost:8059')
+			.get('/data')
+			.query({
+				foo: 'bar',
+				lorem: 'ipsum'
 			})
-			.listen(9196, e => {
-				if (e) {
-					done(e);
+			.expect('Content-Type', /json/)
+			.expect(Object.assign({}, data, {
+				query: {
+					foo: 'bar',
+					lorem: 'ipsum'
 				}
-				exec('./cli.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"', err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to POST simple json data', function (done) {
-		const bodyData = {
-			foo: 'Bar'
-		};
-		express()
-			.use(bodyParser.json())
-			.post('/data', (req, res) => {
-				assert.deepStrictEqual(req.body, bodyData);
-				res.sendStatus(200);
-				done();
-			})
-			.listen(9200, e => {
-				if (e) {
-					done(e);
-				}
-				exec('./cli.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'', err => { // eslint-disable-line no-useless-escape
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to POST json data', function (done) {
-		const bodyData = {
-			foo: 'bar',
-			more: {
-				lorem: 'ipsum',
-				dolor: 'sit'
-			}
-		};
-		express()
-			.use(bodyParser.json())
-			.post('/data', (req, res) => {
-				assert.deepStrictEqual(req.body, bodyData);
-				res.sendStatus(200);
-				done();
-			})
-			.listen(9197, e => {
-				if (e) {
-					done(e);
-				}
-				exec(`./cli.js add http://localhost:9197/data --data '${JSON.stringify(bodyData)}'`, err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to POST form data', function (done) {
-		const bodyData = 'parameter=value&also=another';
-		express()
-			.use(bodyParser.urlencoded({extended: true}))
-			.post('/data', (req, res) => {
-				assert.strictEqual(req.body.parameter, 'value');
-				assert.strictEqual(req.body.also, 'another');
-				res.sendStatus(200);
-				done();
-			})
-			.listen(9198, e => {
-				if (e) {
-					done(e);
-				}
-				exec(`./cli.js add http://localhost:9198/data --data "${bodyData}" --verbose`, err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to PUT form data', function (done) {
-		const bodyData = 'parameter=something';
-		express()
-			.use(bodyParser.urlencoded({extended: true}))
-			.put('/data', (req, res) => {
-				assert.strictEqual(req.body.parameter, 'something');
-				res.sendStatus(200);
-				done();
-			})
-			.listen(9199, e => {
-				if (e) {
-					done(e);
-				}
-				exec(`./cli.js add http://localhost:9199/data --data "${bodyData}" --method=put`, err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to send from data file', function (done) {
-		express()
-			.use(bodyParser.urlencoded({extended: true}))
-			.post('/data', (req, res) => {
-				assert.strictEqual(req.body.dolor.trim(), 'sit');
-				res.sendStatus(200);
-				done();
-			})
-			.listen(9201, e => {
-				if (e) {
-					done(e);
-				}
-				exec('./cli.js add http://localhost:9201/data --data ./fixtures/data', err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should be able to send from json data file', function (done) {
-		express()
-			.use(bodyParser.json())
-			.post('/data', (req, res) => {
-				assert.strictEqual(req.body.foo, 'Lorem');
-				res.sendStatus(200);
-				done();
-			})
-			.listen(9202, e => {
-				if (e) {
-					done(e);
-				}
-				exec('./cli.js add http://localhost:9202/data --data ./fixtures/data.json', err => {
-					if (err) {
-						done(err);
-					}
-				}).stdin.end();
-			});
-	});
-	it('should correctly retrieve snapshot data', function (done) {
-		this.timeout(6000);
-		exec('./cli.js add http://localhost:9194/data', err => {
-			if (err) {
-				return done(err);
-			}
-			const child = spawn('./cli.js', ['start']);
-			child.stderr.on('data', err => {
-				throw new Error(err.toString());
-			});
-			child.stdin.end();
-			setTimeout(() => {
-				request('http://localhost:8059')
-					.get('/data')
-					.expect('Content-Type', /json/)
-					.expect(data)
-					.end(error => { // eslint-disable-line
-						child.kill();
-						done(err || error);
-					});
-			}, 2000);
-		}).stdin.end();
-	});
-	it('should correctly retrieve snapshot data from post method', function (done) {
-		this.timeout(6000);
-		exec('./cli.js add http://localhost:9194/data --method=post', err => {
-			if (err) {
-				return done(err);
-			}
-			const child = spawn('./cli.js', ['start']);
-			child.stderr.on('data', err => {
-				throw new Error(err.toString());
-			});
-			child.stdin.end();
-			setTimeout(() => {
-				request('http://localhost:8059')
-					.post('/data')
-					.expect('Content-Type', /json/)
-					.expect(postData)
-					.end(err => { // eslint-disable-line
-						child.kill();
-						done(err);
-					});
-			}, 2000);
-		}).stdin.end();
-	});
-	it('should correctly retrieve snapshot data from multiple http methods', function (done) {
-		this.timeout(6000);
-		exec('./cli.js add http://localhost:9194/data --method=post,get,put', err => {
-			if (err) {
-				return done(err);
-			}
-			const child = spawn('./cli.js', ['start']);
-			child.stderr.on('data', err => {
-				throw new Error(err.toString());
-			});
-			child.stdin.end();
-			setTimeout(() => {
-				request('http://localhost:8059')
-					.put('/data')
-					.expect('Content-Type', /json/)
-					.expect(putData)
-					.end(err => { // eslint-disable-line
-						child.kill();
-						done(err);
-					});
-			}, 2000);
-		}).stdin.end();
-	});
+			}))
+	}));
+
+	// ---
+
 	it('should print route messages to console by default', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
@@ -364,6 +411,7 @@ describe('snapstub cli', function () {
 			}, 2000);
 		}).stdin.end();
 	});
+
 	it('should print messages to console when using --verbose option', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
@@ -382,6 +430,7 @@ describe('snapstub cli', function () {
 			});
 		}).stdin.end();
 	});
+
 	it('should not print messages to console when using --silent option', function (done) {
 		this.timeout(6000);
 		exec('./cli.js add http://localhost:9194/data', err => {
@@ -405,53 +454,7 @@ describe('snapstub cli', function () {
 			}, 2000);
 		}).stdin.end();
 	});
-	it('should be able to save arbitrary endpoint data', function (done) {
-		this.timeout(6000);
-		const parent = exec('./cli.js save /foo', err => {
-			if (err) {
-				return done(err);
-			}
-			const child = spawn('./cli.js', ['start', '--silent']);
-			child.on('error', done);
-			child.stdin.end();
-			setTimeout(() => {
-				request('http://localhost:8059')
-					.get('/foo')
-					.expect(200)
-					.expect('Content-Type', /json/)
-					.expect({pork: true})
-					.end(err => { // eslint-disable-line
-						child.kill();
-						done(err);
-					});
-			}, 2000);
-		});
-		parent.stdin.write('{"pork":true}');
-		parent.stdin.end();
-	});
-	it('should be able to save to diff methods', function (done) {
-		this.timeout(6000);
-		const parent = exec('./cli.js save /foo --method=post', err => {
-			if (err) {
-				return done(err);
-			}
-			const child = spawn('./cli.js', ['start', '--silent']);
-			child.on('error', done);
-			child.stdin.end();
-			setTimeout(() => {
-				request('http://localhost:8059')
-					.post('/foo')
-					.expect(200)
-					.expect('Content-Type', /json/)
-					.end(err => { // eslint-disable-line
-						child.kill();
-						done(err);
-					});
-			}, 2000);
-		});
-		parent.stdin.write('{"pork":true}');
-		parent.stdin.end();
-	});
+
 	it('should be able to save to multiple methods', function (done) {
 		this.timeout(6000);
 		const parent = exec('./cli.js save /foo --method=post,put', err => {
@@ -485,12 +488,14 @@ describe('snapstub cli', function () {
 		parent.stdin.write('{"pork":true}');
 		parent.stdin.end();
 	});
+
 	it('should get help message when using no valid command', function (done) {
 		exec('./cli.js', (err, stdout) => {
 			assert.strictEqual(stdout.indexOf('Usage:'), 1);
 			done(err);
 		}).stdin.end();
 	});
+
 	it('should get version number when using --version flag', function (done) {
 		exec('./cli.js --version', (err, stdout) => {
 			assert.strictEqual(stdout.trim(), require('./package.json').version);

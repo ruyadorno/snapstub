@@ -9,11 +9,7 @@ const {parse} = require('query-string');
 
 const saveCmd = require('./save');
 
-function addCmd(opts) {
-	const addOptions = opts.addOptions;
-	const url = opts.url;
-	const methodList = addOptions.method || 'get';
-	const methods = methodList.split(',');
+function addCmd({addOptions, mockFolderName, url}) {
 	const customHeaders = [].concat(addOptions.header).join('\n');
 
 	function getData() {
@@ -44,10 +40,10 @@ function addCmd(opts) {
 		}
 
 		return {
-			body: body,
-			form: form,
-			json: json,
-			type: type
+			body,
+			form,
+			json,
+			type
 		};
 	}
 
@@ -55,7 +51,7 @@ function addCmd(opts) {
 		let opts = {
 			headers: parseHeaders(customHeaders),
 			json: !addOptions.nojson,
-			method: method
+			method: method.trim().toLowerCase()
 		};
 
 		// Set body data, skips only TRACE method
@@ -83,15 +79,27 @@ function addCmd(opts) {
 		return opts;
 	}
 
+	const reqs = (addOptions.method || 'get')
+		.split(',')
+		.filter(Boolean)
+		.map(name => getOpts(name));
+
 	Promise.all(
-		methods.map(name => got(url, getOpts(name.toLowerCase())))
+		reqs.map(opts => got(url, opts))
 	)
 		.then(results => {
-			methods.forEach((method, index) => saveCmd({
+			reqs.forEach((opts, index) => saveCmd({
+				mockFolderName,
 				url: url,
 				stdin: results[index].body,
 				saveOptions: {
-					method: method,
+					hashAlgorithm: addOptions.hashAlgorithm,
+					hashHeaders: addOptions.hashHeaders,
+					hashCookies: addOptions.hashCookies,
+					data: opts.body,
+					headers: opts.headers,
+					method: opts.method,
+					nohash: addOptions.nohash,
 					nojson: addOptions.nojson
 				}
 			}));
