@@ -2,14 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const {parse: urlParse} = require('url');
 
-const jsonlint = require('jsonlint/lib/formatter');
 const mkdirp = require('mkdirp');
 const out = require('simple-output');
 const requestHash = require('request-hash');
 
 function saveCmd(opts) {
 	const {saveOptions, url} = opts;
-	const stdin = typeof opts.stdin === 'string' ? opts.stdin : JSON.stringify(opts.stdin);
+	const stdin = typeof opts.stdin === 'string' ? opts.stdin : JSON.stringify(opts.stdin, undefined, 2);
 	const getOpts = arr => (arr && arr.split(',').filter(Boolean).map(i => i.trim())) || [];
 
 	const {query, pathname} = urlParse(url || '', true);
@@ -48,7 +47,7 @@ function saveCmd(opts) {
 		);
 		const fileContent = nojson ?
 			`module.exports = (req, res) => { res.send('${stdin}'); };` :
-			jsonlint.formatter.formatJson(stdin);
+			stdin;
 
 		// Creates mocks folder
 		mkdirp.sync(folderPath);
