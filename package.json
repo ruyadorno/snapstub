@@ -42,12 +42,12 @@
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.16.0",
-    "eslint": "^5.6.0",
-    "eslint-config-xo": "^0.25.0",
+    "eslint": "^6.1.0",
+    "eslint-config-xo": "^0.26.0",
     "express": "^4.14.1",
-    "mocha": "^5.2.0",
-    "rimraf": "^2.5.4",
-    "supertest": "^3.3.0"
+    "mocha": "^6.2.0",
+    "rimraf": "^3.0.0",
+    "supertest": "^4.0.2"
   },
   "dependencies": {
     "get-stdin": "^7.0.0",
@@ -60,7 +60,7 @@
     "query-string": "^6.1.0",
     "request-hash": "^1.0.3",
     "simple-output": "^1.0.0",
-    "stubborn-server": "^1.0.1",
+    "stubborn-server": "^1.0.5",
     "stubborn-server-hash-loader": "^1.0.0"
   }
 }
