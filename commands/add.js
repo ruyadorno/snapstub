@@ -76,6 +76,7 @@ function addCmd({addOptions, mockFolderName, url}) {
 				}, baseOpts.headers)
 			});
 		}
+
 		return opts;
 	}
 

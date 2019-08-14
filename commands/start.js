@@ -34,6 +34,7 @@ function startCmd(opts) {
 		out.error('Failed to launch snapstub server');
 	}
 }
+
 function printRoutes(srcPath, port) {
 	const patterns = methods.map(m => `**/${m}.+(json|js)`);
 
@@ -42,6 +43,7 @@ function printRoutes(srcPath, port) {
 			const routes = paths.map(p => {
 				// Remove filename from path
 				const directoryPath = p.substring(0, p.lastIndexOf('/'));
+
 				return `http://localhost:${port}/${directoryPath}`;
 			});
 			for (let route of new Set(routes)) {

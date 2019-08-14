@@ -82,6 +82,7 @@ describe('snapstub cli', function () {
 				if (err) {
 					done(err);
 				}
+
 				assert.strictEqual(stdout.trim(), expected);
 				done();
 			}).stdin.end();
@@ -99,6 +100,7 @@ describe('snapstub cli', function () {
 			const emptyMiddleware = (a, b, n) => {
 				n();
 			};
+
 			express()
 				.use(middleware || emptyMiddleware)[method]('/data', (req, res) => {
 					test(req, res);
@@ -108,6 +110,7 @@ describe('snapstub cli', function () {
 					if (e) {
 						done(e);
 					}
+
 					exec(cmd, err => {
 						if (err) {
 							done(err);
@@ -129,13 +132,16 @@ describe('snapstub cli', function () {
 				if (debug) {
 					console.log(stdout);
 				}
+
 				if (err) {
 					return done(err);
 				}
+
 				const child = spawn('./cli.js', ['start']);
 				if (debug) {
 					child.stdout.on('data', i => console.log(i.toString()));
 				}
+
 				child.stderr.on('data', err => {
 					throw new Error(err.toString());
 				});
@@ -151,15 +157,16 @@ describe('snapstub cli', function () {
 			if (stdinWrite) {
 				p.stdin.write(stdinWrite);
 			}
+
 			p.stdin.end();
 		};
 	}
 
-	before(function (done) {
+	beforeEach(function (done) {
 		mkdirp(path.join(__dirname, '__mocks__'), done);
 	});
 
-	after(function (done) {
+	afterEach(function (done) {
 		rimraf(path.join(__dirname, '__mocks__'), done);
 	});
 
@@ -399,6 +406,7 @@ describe('snapstub cli', function () {
 			if (err) {
 				return done(err);
 			}
+
 			const child = spawn('./cli.js', ['start']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
@@ -409,12 +417,14 @@ describe('snapstub cli', function () {
 					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data\n');
 				});
 			}
+
 			function validateSuccessMsg() {
 				child.stdout.once('data', data => {
 					assert.equal(data.toString(), '✔  Successfully launched snapstub server on: http://localhost:8059\n');
 					validateRouteMsg();
 				});
 			}
+
 			validateSuccessMsg();
 			setTimeout(() => {
 				child.kill();
@@ -429,6 +439,7 @@ describe('snapstub cli', function () {
 			if (err) {
 				return done(err);
 			}
+
 			const child = spawn('./cli.js', ['start', '--verbose']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
@@ -448,6 +459,7 @@ describe('snapstub cli', function () {
 			if (err) {
 				return done(err);
 			}
+
 			const child = spawn('./cli.js', ['start', '--silent']);
 			child.stderr.on('data', err => {
 				throw new Error(err.toString());
@@ -472,6 +484,7 @@ describe('snapstub cli', function () {
 			if (err) {
 				return done(err);
 			}
+
 			const child = spawn('./cli.js', ['start', '--silent']);
 			child.on('error', done);
 			child.stdin.end();
@@ -485,6 +498,7 @@ describe('snapstub cli', function () {
 							child.kill();
 							done(err);
 						}
+
 						request('http://localhost:8059')
 							.post('/foo')
 							.expect(200)
