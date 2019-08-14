@@ -162,11 +162,11 @@ describe('snapstub cli', function () {
 		};
 	}
 
-	before(function (done) {
+	beforeEach(function (done) {
 		mkdirp(path.join(__dirname, '__mocks__'), done);
 	});
 
-	after(function (done) {
+	afterEach(function (done) {
 		rimraf(path.join(__dirname, '__mocks__'), done);
 	});
 
