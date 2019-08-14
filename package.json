@@ -50,8 +50,8 @@
     "supertest": "^3.3.0"
   },
   "dependencies": {
-    "get-stdin": "^6.0.0",
-    "globby": "^8.0.1",
+    "get-stdin": "^7.0.0",
+    "globby": "^10.0.1",
     "got": "^9.2.2",
     "methods": "^1.1.2",
     "minimist": "^1.2.0",
