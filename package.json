@@ -4,6 +4,9 @@
   "description": "Snapshot-based stub/mocking of APIs",
   "main": "index.js",
   "bin": "cli.js",
+  "engines": {
+    "node": ">=10"
+  },
   "files": [
     "index.js",
     "cli.js",
@@ -60,7 +63,7 @@
     "query-string": "^6.1.0",
     "request-hash": "^1.0.3",
     "simple-output": "^1.0.0",
-    "stubborn-server": "^1.0.5",
+    "stubborn-server": "^2.0.1",
     "stubborn-server-hash-loader": "^1.0.0"
   }
 }
