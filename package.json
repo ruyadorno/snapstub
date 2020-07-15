@@ -56,8 +56,8 @@
   },
   "dependencies": {
     "get-stdin": "^7.0.0",
-    "globby": "^10.0.1",
-    "got": "^9.2.2",
+    "globby": "^11.0.0",
+    "got": "^10.6.0",
     "methods": "^1.1.2",
     "minimist": "^1.2.5",
     "mkdirp": "^0.5.1",

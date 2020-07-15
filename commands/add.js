@@ -14,43 +14,44 @@ function addCmd({addOptions, mockFolderName, url}) {
 
 	function getData() {
 		let data = addOptions.data;
-		let body;
-		let type;
-		let form = false;
-		let json = false;
 
+		const jsonResult = () => ({
+			json: JSON.parse(data)
+		});
+
+		const formResult = () => ({
+			form: parse(data)
+		});
+
+		const textResult = () => ({
+			body: data
+		});
+
+		// In case addOptions.data is pointing to a filename, loads that
 		try {
 			data = fs.readFileSync(data).toString();
-		} catch (e) {
-		}
+		} catch (e) {}
 
 		try {
-			body = JSON.parse(data);
-			type = 'application/json';
-			json = true;
-		} catch (e) {
-			try {
-				body = parse(data);
-				type = 'application/x-www-form-urlencoded';
-				form = true;
-			} catch (e) {
-				body = data;
-				type = 'text/plain';
+			const jsonRes = jsonResult();
+			if (addOptions.nojson) {
+				return textResult();
 			}
-		}
 
-		return {
-			body,
-			form,
-			json,
-			type
-		};
+			return jsonRes;
+		} catch (e) {}
+
+		try {
+			const formRes = formResult();
+			return formRes;
+		} catch (e) {}
+
+		return textResult();
 	}
 
 	function getOpts(method) {
 		let opts = {
 			headers: parseHeaders(customHeaders),
-			json: !addOptions.nojson,
 			method: method.trim().toLowerCase()
 		};
 
@@ -58,22 +59,16 @@ function addCmd({addOptions, mockFolderName, url}) {
 		// https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
 		if (method !== 'trace' && addOptions.data) {
 			let data = getData();
-			const baseOpts = Object.assign({}, opts, {
-				form: data.form,
-				json: data.json && !addOptions.nojson
-			});
-
 			// If no method was set using data, defaults to post
 			if (!addOptions.method) {
-				baseOpts.method = 'post';
+				opts.method = 'post';
 			}
 
 			// Sets data and content-type for request
-			opts = Object.assign({}, baseOpts, {
-				body: data.body,
+			opts = Object.assign({}, opts, data, {
 				headers: Object.assign({
 					'content-type': data.type
-				}, baseOpts.headers)
+				}, opts.headers)
 			});
 		}
 
@@ -85,9 +80,10 @@ function addCmd({addOptions, mockFolderName, url}) {
 		.filter(Boolean)
 		.map(name => getOpts(name));
 
-	Promise.all(
-		reqs.map(opts => got(url, opts))
-	)
+	Promise.all(reqs.map(opts => got(url, opts)))
+		.then(results => results.map((result, index) =>
+			reqs[index].json ? result.json() : result
+		))
 		.then(results => {
 			reqs.forEach((opts, index) => saveCmd({
 				mockFolderName,
