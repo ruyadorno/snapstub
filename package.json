@@ -57,7 +57,7 @@
     "globby": "^10.0.1",
     "got": "^9.2.2",
     "methods": "^1.1.2",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "mkdirp": "^0.5.1",
     "parse-headers": "^2.0.1",
     "query-string": "^6.1.0",
