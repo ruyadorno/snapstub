@@ -1,9 +1,11 @@
 {
   "name": "snapstub",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Snapshot-based stub/mocking of APIs",
   "main": "index.js",
-  "bin": "cli.js",
+  "bin": {
+    "snapstub": "cli.js"
+  },
   "engines": {
     "node": ">=10"
   },
