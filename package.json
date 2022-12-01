@@ -60,7 +60,7 @@
     "got": "^12.5.3",
     "methods": "^1.1.2",
     "minimist": "^1.2.5",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.4",
     "parse-headers": "^2.0.1",
     "query-string": "^7.1.2",
     "request-hash": "^1.0.3",

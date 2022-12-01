@@ -5,8 +5,9 @@
 const assert = require('assert');
 const {exec, spawn} = require('child_process');
 const path = require('path');
+const {callbackify} = require('util');
 const rimraf = require('rimraf');
-const mkdirp = require('mkdirp');
+const mkdirp = callbackify(require('mkdirp'));
 const express = require('express');
 const request = require('supertest');
 const bodyParser = require('body-parser');
