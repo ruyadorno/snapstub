@@ -15,11 +15,11 @@ function saveCmd(opts) {
 	const {data, headers, hashAlgorithm, hashHeaders, hashCookies, method, nohash, nojson} = saveOptions;
 	const hashHeadersOpts = getOpts(hashHeaders);
 	const hashCookiesOpts = getOpts(hashCookies);
-	const shouldHash = data ||
-		Object.keys(query).length > 0 ||
-		(headers && Object.keys(headers).length > 0 && (
-			(hashHeadersOpts && hashHeadersOpts.length > 0) ||
-			(hashCookiesOpts && hashCookiesOpts.length > 0)
+	const shouldHash = data
+		|| Object.keys(query).length > 0
+		|| (headers && Object.keys(headers).length > 0 && (
+			(hashHeadersOpts && hashHeadersOpts.length > 0)
+			|| (hashCookiesOpts && hashCookiesOpts.length > 0)
 		));
 
 	const methods = (method || 'get').split(',');
@@ -29,25 +29,25 @@ function saveCmd(opts) {
 	const fileExt = nojson ? '.js' : '.json';
 
 	methods.forEach(method => {
-		const hashSuffix = !nohash && shouldHash ?
-			'-' + requestHash({
+		const hashSuffix = !nohash && shouldHash
+			? '-' + requestHash({
 				algorithm: hashAlgorithm,
 				headers: hashHeadersOpts,
-				cookies: hashCookiesOpts
+				cookies: hashCookiesOpts,
 			})({
 				method,
 				url,
 				body: data,
-				headers
-			}) :
-			'';
+				headers,
+			})
+			: '';
 		const fileName = path.join(
 			folderPath,
-			method.toLowerCase().trim() + hashSuffix + fileExt
+			method.toLowerCase().trim() + hashSuffix + fileExt,
 		);
-		const fileContent = nojson ?
-			`module.exports = (req, res) => { res.send('${stdin}'); };` :
-			stdin;
+		const fileContent = nojson
+			? `module.exports = (req, res) => { res.send('${stdin}'); };`
+			: stdin;
 
 		// Creates mocks folder
 		mkdirp.sync(folderPath);

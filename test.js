@@ -15,17 +15,17 @@ const data = {
 	foo: 'bar',
 	lorem: 'Ipsum',
 	a: {
-		b: 'c'
+		b: 'c',
 	},
-	query: {}
+	query: {},
 };
 
 const postData = {
-	success: true
+	success: true,
 };
 
 const putData = {
-	x: 'foo'
+	x: 'foo',
 };
 
 express()
@@ -33,10 +33,10 @@ express()
 		res.send('<html><body><h1>Hello world</h1></body></html>');
 	})
 	.get('/data', (req, res) => {
-		res.json(Object.assign({},
-			data,
-			{query: req.query}
-		));
+		res.json({
+			...data,
+			query: req.query,
+		});
 	})
 	.post('/data', (req, res) => {
 		res.json(postData);
@@ -46,7 +46,7 @@ express()
 	})
 	.listen(9194);
 
-describe('snapstub api', function () {
+describe('snapstub api', () => {
 	const snapstub = require('./');
 
 	// Mute stdout prints
@@ -54,10 +54,10 @@ describe('snapstub api', function () {
 	const _write = out.stdout.write;
 	out.stdout.write = a => a;
 
-	it('should correctly start a server', function (done) {
+	it('should correctly start a server', done => {
 		snapstub.start({
 			verbose: false,
-			mockFolderName: 'mocks'
+			mockFolderName: 'mocks',
 		});
 		request('http://localhost:8059')
 			.get('/data')
@@ -72,10 +72,10 @@ describe('snapstub api', function () {
 	});
 });
 
-describe('snapstub cli', function () {
+describe('snapstub cli', () => {
 	function runOnly({
 		cmd,
-		expected
+		expected,
 	}) {
 		return function (done) {
 			exec(cmd, (err, stdout) => {
@@ -94,7 +94,7 @@ describe('snapstub cli', function () {
 		port,
 		method,
 		middleware,
-		test
+		test,
 	}) {
 		return function (done) {
 			const emptyMiddleware = (a, b, n) => {
@@ -124,7 +124,7 @@ describe('snapstub cli', function () {
 		cmd,
 		debug,
 		supertests,
-		stdinWrite
+		stdinWrite,
 	}) {
 		return function (done) {
 			this.timeout(6000);
@@ -162,11 +162,11 @@ describe('snapstub cli', function () {
 		};
 	}
 
-	beforeEach(function (done) {
+	beforeEach(done => {
 		mkdirp(path.join(__dirname, '__mocks__'), done);
 	});
 
-	afterEach(function (done) {
+	afterEach(done => {
 		rimraf(path.join(__dirname, '__mocks__'), done);
 	});
 
@@ -174,43 +174,43 @@ describe('snapstub cli', function () {
 
 	it('should correctly save a snapshot', runOnly({
 		cmd: './cli.js add http://localhost:9194/data',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`,
 	}));
 
 	it('should correctly save many snapshot methods', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --method=post,head',
 		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'post.json')}
-✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'head.json')}`
+✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'head.json')}`,
 	}));
 
 	it('should correctly save query param using hashed filename', runOnly({
 		cmd: './cli.js add http://localhost:9194/data?foo=bar',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e86365266e9e38d9a280c46142e665acbb2a262a9a00281be4a41309b678e952.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e86365266e9e38d9a280c46142e665acbb2a262a9a00281be4a41309b678e952.json')}`,
 	}));
 
 	it('should correctly save using hashAlgorithm option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data?foo=bar --hashAlgorithm=md5',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e198fcea7ddae86f20d9844a2243b714.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e198fcea7ddae86f20d9844a2243b714.json')}`,
 	}));
 
 	it('should correctly save using hashHeaders option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashHeaders=content-type --header="Content-Type: application/json"',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-f83d19fbff806055593a9369c72c591d49b830bae4b2621709eb806f267ff63d.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-f83d19fbff806055593a9369c72c591d49b830bae4b2621709eb806f267ff63d.json')}`,
 	}));
 
 	it('should correctly save using multiple hashHeaders option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashHeaders=content-type,x-foo --header="Content-Type: application/json" --header="X-Foo: bar"',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json')}`,
 	}));
 
 	it('should correctly filter cookies using hashCookies option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashCookies=foo,bar --header="Cookie: foo=foo; bar=bar; lorem=lorem" --header="X-Foo: bar"',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b6b48a0dfb604db54f3f559ff763e640a32e90f4ca12f33d68f3e80ab284f9b4.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b6b48a0dfb604db54f3f559ff763e640a32e90f4ca12f33d68f3e80ab284f9b4.json')}`,
 	}));
 
 	it('should skip hash when using nohash option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashCookies=foo,bar --header="Cookie: foo=foo; bar=bar; lorem=lorem" --header="X-Foo: bar" --nohash',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`
+		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`,
 	}));
 
 	// ---
@@ -221,32 +221,32 @@ describe('snapstub cli', function () {
 		cmd: './cli.js add http://localhost:9195/data --header "X-Token: 0123F"',
 		method: 'get',
 		port: 9195,
-		test: (req, res) => {
+		test(req, res) {
 			assert.strictEqual(req.get('X-Token'), '0123F');
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	it('should be able to set multiple custom headers when adding snapshots', runMockTest({
 		cmd: './cli.js add http://localhost:9196/data --header "X-Token: 0123F" --header "X-Foo: bar"',
 		method: 'get',
 		port: 9196,
-		test: (req, res) => {
+		test(req, res) {
 			assert.strictEqual(req.get('X-Foo'), 'bar');
 			assert.strictEqual(req.get('X-Token'), '0123F');
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	it('should be able to POST simple json data', runMockTest({
-		cmd: './cli.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'', // eslint-disable-line no-useless-escape
+		cmd: './cli.js add http://localhost:9200/data --data \'{ "foo": "Bar" }\'',
 		method: 'post',
 		middleware: bodyParser.json(),
 		port: 9200,
-		test: (req, res) => {
+		test(req, res) {
 			assert.deepStrictEqual(req.body, {foo: 'Bar'});
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	it('should be able to POST json data', (bodyData => runMockTest({
@@ -254,16 +254,16 @@ describe('snapstub cli', function () {
 		method: 'post',
 		middleware: bodyParser.json(),
 		port: 9197,
-		test: (req, res) => {
+		test(req, res) {
 			assert.deepStrictEqual(req.body, bodyData);
 			res.sendStatus(200);
-		}
+		},
 	}))({
 		foo: 'bar',
 		more: {
 			lorem: 'ipsum',
-			dolor: 'sit'
-		}
+			dolor: 'sit',
+		},
 	}));
 
 	it('should be able to POST form data', runMockTest({
@@ -271,11 +271,11 @@ describe('snapstub cli', function () {
 		method: 'post',
 		middleware: bodyParser.urlencoded({extended: true}),
 		port: 9198,
-		test: (req, res) => {
+		test(req, res) {
 			assert.strictEqual(req.body.parameter, 'value');
 			assert.strictEqual(req.body.also, 'another');
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	it('should be able to PUT form data', runMockTest({
@@ -283,10 +283,10 @@ describe('snapstub cli', function () {
 		method: 'put',
 		middleware: bodyParser.urlencoded({extended: true}),
 		port: 9199,
-		test: (req, res) => {
+		test(req, res) {
 			assert.strictEqual(req.body.parameter, 'something');
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	it('should be able to send from data file', runMockTest({
@@ -294,10 +294,10 @@ describe('snapstub cli', function () {
 		method: 'post',
 		middleware: bodyParser.urlencoded({extended: true}),
 		port: 9201,
-		test: (req, res) => {
+		test(req, res) {
 			assert.strictEqual(req.body.dolor.trim(), 'sit');
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	it('should be able to send from json data file', runMockTest({
@@ -305,10 +305,10 @@ describe('snapstub cli', function () {
 		method: 'post',
 		middleware: bodyParser.json(),
 		port: 9202,
-		test: (req, res) => {
+		test(req, res) {
 			assert.strictEqual(req.body.foo, 'Lorem');
 			res.sendStatus(200);
-		}
+		},
 	}));
 
 	// ---
@@ -320,7 +320,7 @@ describe('snapstub cli', function () {
 		supertests: () => request('http://localhost:8059')
 			.get('/data')
 			.expect('Content-Type', /json/)
-			.expect(data)
+			.expect(data),
 	}));
 
 	it('should correctly retrieve snapshot data from post method', runAndLoadMockTest({
@@ -328,7 +328,7 @@ describe('snapstub cli', function () {
 		supertests: () => request('http://localhost:8059')
 			.post('/data')
 			.expect('Content-Type', /json/)
-			.expect(postData)
+			.expect(postData),
 	}));
 
 	it('should correctly retrieve snapshot data from multiple http methods', runAndLoadMockTest({
@@ -336,7 +336,7 @@ describe('snapstub cli', function () {
 		supertests: () => request('http://localhost:8059')
 			.put('/data')
 			.expect('Content-Type', /json/)
-			.expect(putData)
+			.expect(putData),
 	}));
 
 	it('should be able to save arbitrary endpoint data', runAndLoadMockTest({
@@ -346,7 +346,7 @@ describe('snapstub cli', function () {
 			.expect(200)
 			.expect('Content-Type', /json/)
 			.expect({pork: true}),
-		stdinWrite: '{"pork":true}'
+		stdinWrite: '{"pork":true}',
 	}));
 
 	it('should be able to save to diff methods', runAndLoadMockTest({
@@ -355,7 +355,7 @@ describe('snapstub cli', function () {
 			.post('/foo')
 			.expect(200)
 			.expect('Content-Type', /json/),
-		stdinWrite: '{"pork":true}'
+		stdinWrite: '{"pork":true}',
 	}));
 
 	it('should be able to save and retrieve specific added endpoint using query string parameters', runAndLoadMockTest({
@@ -363,14 +363,12 @@ describe('snapstub cli', function () {
 		supertests: () => request('http://localhost:8059')
 			.get('/data')
 			.query({
-				msg: 'lorem ipsum'
+				msg: 'lorem ipsum',
 			})
 			.expect('Content-Type', /json/)
-			.expect(Object.assign({}, data, {
-				query: {
-					msg: 'lorem ipsum'
-				}
-			}))
+			.expect({...data, query: {
+				msg: 'lorem ipsum',
+			}}),
 	}));
 
 	it('should be able to save and retrieve specific added endpoint using multiple query string parameters', runAndLoadMockTest({
@@ -379,15 +377,13 @@ describe('snapstub cli', function () {
 			.get('/data')
 			.query({
 				foo: 'bar',
-				lorem: 'ipsum'
+				lorem: 'ipsum',
 			})
 			.expect('Content-Type', /json/)
-			.expect(Object.assign({}, data, {
-				query: {
-					foo: 'bar',
-					lorem: 'ipsum'
-				}
-			}))
+			.expect({...data, query: {
+				foo: 'bar',
+				lorem: 'ipsum',
+			}}),
 	}));
 
 	it('should be able to save and retrieve specific text based responses using --nojson option', runAndLoadMockTest({
@@ -395,7 +391,7 @@ describe('snapstub cli', function () {
 		supertests: () => request('http://localhost:8059')
 			.get('/html')
 			.expect('Content-Type', /text/)
-			.expect('<html><body><h1>Hello world</h1></body></html>')
+			.expect('<html><body><h1>Hello world</h1></body></html>'),
 	}));
 
 	// ---
@@ -493,7 +489,7 @@ describe('snapstub cli', function () {
 					.put('/foo')
 					.expect(200)
 					.expect('Content-Type', /json/)
-					.end(err => { // eslint-disable-line
+					.end(err => {
 						if (err) {
 							child.kill();
 							done(err);
@@ -514,14 +510,14 @@ describe('snapstub cli', function () {
 		parent.stdin.end();
 	});
 
-	it('should get help message when using no valid command', function (done) {
+	it('should get help message when using no valid command', done => {
 		exec('./cli.js', (err, stdout) => {
 			assert.strictEqual(stdout.indexOf('Usage:'), 1);
 			done(err);
 		}).stdin.end();
 	});
 
-	it('should get version number when using --version flag', function (done) {
+	it('should get version number when using --version flag', done => {
 		exec('./cli.js --version', (err, stdout) => {
 			assert.strictEqual(stdout.trim(), require('./package.json').version);
 			done(err);

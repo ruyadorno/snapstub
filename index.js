@@ -7,19 +7,17 @@ module.exports = {
 	add: require('./commands/add'),
 	help: require('./commands/help'),
 	save: require('./commands/save'),
-	start: opts => {
+	start(opts) {
 		// Defines a default stubborn server value
-		const options = Object.assign({
-			stubborn: stubborn
-		}, opts);
+		const options = {stubborn, ...opts};
 		// Execs the start command
 		require('./commands/start')(options);
 		return stubborn;
 	},
-	stop: () => {
+	stop() {
 		stubborn.stop();
 		return stubborn;
 	},
-	version: require('./commands/version')
+	version: require('./commands/version'),
 };
 
