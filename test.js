@@ -174,43 +174,43 @@ describe('snapstub cli', () => {
 
 	it('should correctly save a snapshot', runOnly({
 		cmd: './cli.js add http://localhost:9194/data',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`,
 	}));
 
 	it('should correctly save many snapshot methods', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --method=post,head',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'post.json')}
-✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'head.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'post.json')}
+\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'head.json')}`,
 	}));
 
 	it('should correctly save query param using hashed filename', runOnly({
 		cmd: './cli.js add http://localhost:9194/data?foo=bar',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e86365266e9e38d9a280c46142e665acbb2a262a9a00281be4a41309b678e952.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e86365266e9e38d9a280c46142e665acbb2a262a9a00281be4a41309b678e952.json')}`,
 	}));
 
 	it('should correctly save using hashAlgorithm option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data?foo=bar --hashAlgorithm=md5',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e198fcea7ddae86f20d9844a2243b714.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-e198fcea7ddae86f20d9844a2243b714.json')}`,
 	}));
 
 	it('should correctly save using hashHeaders option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashHeaders=content-type --header="Content-Type: application/json"',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-f83d19fbff806055593a9369c72c591d49b830bae4b2621709eb806f267ff63d.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-f83d19fbff806055593a9369c72c591d49b830bae4b2621709eb806f267ff63d.json')}`,
 	}));
 
 	it('should correctly save using multiple hashHeaders option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashHeaders=content-type,x-foo --header="Content-Type: application/json" --header="X-Foo: bar"',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b80e4b47fa8931fb55b7ad74a4c96b1db12454c89a51646710b06bc6c51f9d45.json')}`,
 	}));
 
 	it('should correctly filter cookies using hashCookies option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashCookies=foo,bar --header="Cookie: foo=foo; bar=bar; lorem=lorem" --header="X-Foo: bar"',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b6b48a0dfb604db54f3f559ff763e640a32e90f4ca12f33d68f3e80ab284f9b4.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get-b6b48a0dfb604db54f3f559ff763e640a32e90f4ca12f33d68f3e80ab284f9b4.json')}`,
 	}));
 
 	it('should skip hash when using nohash option', runOnly({
 		cmd: './cli.js add http://localhost:9194/data --hashCookies=foo,bar --header="Cookie: foo=foo; bar=bar; lorem=lorem" --header="X-Foo: bar" --nohash',
-		expected: `✔  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`,
+		expected: `\x1B[32m✔\x1B[39m  Successfully added: ${path.join(__dirname, '__mocks__', 'data', 'get.json')}`,
 	}));
 
 	// ---
@@ -410,13 +410,13 @@ describe('snapstub cli', () => {
 			child.stdin.end();
 			function validateRouteMsg() {
 				child.stdout.once('data', d => {
-					assert.equal(d.toString(), 'ℹ  http://localhost:8059/data\n');
+					assert.equal(d.toString(), '\x1B[34mℹ\x1B[39m  http://localhost:8059/data\n');
 				});
 			}
 
 			function validateSuccessMsg() {
 				child.stdout.once('data', data => {
-					assert.equal(data.toString(), '✔  Successfully launched snapstub server on: http://localhost:8059\n');
+					assert.equal(data.toString(), '\x1B[32m✔\x1B[39m  Successfully launched snapstub server on: http://localhost:8059\n');
 					validateRouteMsg();
 				});
 			}

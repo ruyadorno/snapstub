@@ -64,7 +64,7 @@
     "parse-headers": "^2.0.1",
     "query-string": "^6.1.0",
     "request-hash": "^1.0.3",
-    "simple-output": "^1.0.0",
+    "simple-output": "^3.0.0",
     "stubborn-server": "^2.0.1",
     "stubborn-server-hash-loader": "^1.0.0"
   }
