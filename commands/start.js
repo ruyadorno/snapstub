@@ -20,17 +20,17 @@ function startCmd(opts) {
 					loader: hashLoader({
 						algorithm: opts.hashAlgorithm,
 						headers: opts.hashHeaders || [],
-						cookies: opts.hashCookies || []
-					})
-				}
-			]
+						cookies: opts.hashCookies || [],
+					}),
+				},
+			],
 		});
 		if (!opts.silent) {
-			out.success('Successfully launched snapstub server on: ' +
-				'http://localhost:' + port);
+			out.success('Successfully launched snapstub server on: '
+				+ 'http://localhost:' + port);
 			printRoutes(mockFolderName, port);
 		}
-	} catch (e) {
+	} catch (_) {
 		out.error('Failed to launch snapstub server');
 	}
 }
@@ -46,7 +46,7 @@ function printRoutes(srcPath, port) {
 
 				return `http://localhost:${port}/${directoryPath}`;
 			});
-			for (let route of new Set(routes)) {
+			for (const route of new Set(routes)) {
 				out.info(route);
 			}
 		});

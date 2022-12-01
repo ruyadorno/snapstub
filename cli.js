@@ -18,11 +18,11 @@ function executeCmd(stdin) {
 			url: argv._[1],
 			addOptions: argv,
 			saveOptions: argv,
-			mockFolderName: mockFolderName,
-			port: port,
-			verbose: verbose,
-			silent: silent,
-			stdin: stdin.trim()
+			mockFolderName,
+			port,
+			verbose,
+			silent,
+			stdin: stdin.trim(),
 		});
 	} else if (argv.version || argv.v) {
 		commands.version();
