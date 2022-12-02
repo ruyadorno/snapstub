@@ -2,7 +2,6 @@
 
 'use strict';
 
-const getStdin = require('get-stdin');
 const out = require('simple-output');
 
 const argv = require('minimist')(process.argv.slice(2));
@@ -31,7 +30,8 @@ function executeCmd(stdin) {
 	}
 }
 
-getStdin()
+import('get-stdin')
+	.then(({default: getStdin}) => getStdin())
 	.then(executeCmd)
 	.catch(e => {
 		if (debug) {

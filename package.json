@@ -55,7 +55,7 @@
     "supertest": "^4.0.2"
   },
   "dependencies": {
-    "get-stdin": "^7.0.0",
+    "get-stdin": "^9.0.0",
     "globby": "^13.1.2",
     "got": "^12.5.3",
     "methods": "^1.1.2",
