@@ -27,7 +27,6 @@ jobs:
 
   test:
     name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
-    if: github.repository_owner == 'npm'
     strategy:
       fail-fast: false
       matrix:
