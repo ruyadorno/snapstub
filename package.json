@@ -52,7 +52,7 @@
     "express": "^4.14.1",
     "mocha": "^10.1.0",
     "rimraf": "^3.0.0",
-    "supertest": "^4.0.2"
+    "supertest": "^6.3.1"
   },
   "dependencies": {
     "get-stdin": "^9.0.0",
