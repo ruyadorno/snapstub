@@ -53,4 +53,4 @@ jobs:
       - name: Install Deps
         run: npm install --no-audit --no-fund
       - name: Test
-        run: node . test --ignore-scripts
+        run: npm test --ignore-scripts
