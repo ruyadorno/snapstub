@@ -20,6 +20,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Install Deps
+        run: npm install --no-audit --no-fund
       - name: Lint
         run: npm run lint
 
@@ -49,5 +51,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Install Deps
+        run: npm install --no-audit --no-fund
       - name: Test
         run: node . test --ignore-scripts
