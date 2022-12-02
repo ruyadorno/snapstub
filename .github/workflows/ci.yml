@@ -35,7 +35,6 @@ jobs:
             os: ubuntu-latest
             shell: bash
         node-version:
-          - 14.x
           - 16.x
           - 18.x
           - 19.x
@@ -54,3 +53,31 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Test
         run: FORCE_COLOR=true npm test --ignore-scripts
+
+# Legacy Node 14 test
+  test-14:
+    name: Test - ${{ matrix.platform.name }} - ${{ matrix.node-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - name: Linux
+            os: ubuntu-latest
+            shell: bash
+        node-version:
+          - 14.x
+    runs-on: ${{ matrix.platform.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.platform.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Deps
+        run: npx npm@9 install --no-audit --no-fund
+      - name: Test
+        run: FORCE_COLOR=true npx npm@9 test --ignore-scripts
