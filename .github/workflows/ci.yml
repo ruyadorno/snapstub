@@ -53,4 +53,4 @@ jobs:
       - name: Install Deps
         run: npm install --no-audit --no-fund
       - name: Test
-        run: npm test --ignore-scripts
+        run: FORCE_COLOR=true npm test --ignore-scripts
