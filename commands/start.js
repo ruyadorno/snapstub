@@ -1,7 +1,6 @@
 'use strict';
 
 const out = require('simple-output');
-const globby = require('globby');
 const methods = require('methods');
 const hashLoader = require('stubborn-server-hash-loader');
 
@@ -38,7 +37,8 @@ function startCmd(opts) {
 function printRoutes(srcPath, port) {
 	const patterns = methods.map(m => `**/${m}.+(json|js|mjs|cjs)`);
 
-	globby(patterns, {cwd: srcPath})
+	import('globby')
+		.then(({globby}) => globby(patterns, {cwd: srcPath}))
 		.then(paths => {
 			const routes = paths.map(p => {
 				// Remove filename from path
