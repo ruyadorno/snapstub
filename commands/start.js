@@ -35,7 +35,7 @@ function startCmd(opts) {
 }
 
 function printRoutes(srcPath, port) {
-	const patterns = methods.map(m => `**/${m}.+(json|js|mjs|cjs)`);
+	const patterns = methods.map(m => `**/${m}*.+(json|js|mjs|cjs)`);
 
 	import('globby')
 		.then(({globby}) => globby(patterns, {cwd: srcPath}))
